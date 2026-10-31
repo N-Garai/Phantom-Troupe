@@ -2,6 +2,7 @@
 import { init, start } from "./commands/init.js";
 import { stop, status, uninstall } from "./commands/lifecycle.js";
 import { capture } from "./commands/capture.js";
+import { settings } from "./commands/settings.js";
 import { runSeance } from "./seance.js";
 import { startDaemon, ensureDaemonAndOpen } from "./server.js";
 import { loadConfig } from "./util/paths.js";
@@ -51,6 +52,9 @@ async function main() {
         case "init":
             await init({ yes: flags.has("--yes"), withTimer: flags.has("--with-timer") });
             return;
+        case "settings":
+            await settings();
+            return;
         case "_capture":
             await capture(rest[0] ?? "1", rest.slice(1).join(" "));
             return;
@@ -72,6 +76,7 @@ async function main() {
             say.dim("   phantom unhook       remove shell capture only");
             say.dim("   phantom uninstall    remove everything (asks about the bones)");
             say.dim("   phantom init         (re)install hooks + config");
+            say.dim("   phantom settings     choose brain (ollama vs gemma-api) + store API key");
             return;
         default:
             say.blood(` unknown séance: '${cmd}' — try 'phantom help'`);

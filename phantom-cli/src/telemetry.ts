@@ -1,25 +1,45 @@
 import { loadConfig } from "./util/paths.js";
 
 /**
- * Crash telemetry for the tool itself — strictly opt-in (PHANTOM_SENTRY_DSN in
- * the environment or sentryDsn in config). Defaults to silence: nothing is
- * sent anywhere unless you ask for it. Agent work is traced with spans so
- * latency, token cost and failures are visible in the trace view.
+ * Crash telemetry for the tool itself — opt-in via PHANTOM_SENTRY_DSN env var
+ * or `sentryDsn` in ~/.phantom/config.json. Defaults to total silence: nothing
+ * is sent anywhere unless you configure it.
  *
  * The SDK is imported DYNAMICALLY and only when a DSN exists: with zero
  * packages installed the troupe still runs at full strength — traced()
  * simply executes the work bare. Telemetry must never take the troupe down.
+ *
+ * What gets traced:
+ *  - AI invocations (agent calls, model latency, failures)
+ *  - Séance operations (nightly sweep, grave tending)
+ *  - Daemon lifecycle (start, stop, exec)
+ *  - Shell hook captures (every failed command autopsy)
+ *
+ * Agent traces are sent with spans so latency, token cost, failures, and
+ * fallback routing are visible in the Sentry trace view.
  */
 
-type SpanCtx = { op: string; name: string };
+type SpanCtx = { op: string; name: string; attributes?: Record<string, unknown> };
 
 type SentryModule = {
-  init: (opts: { dsn: string; tracesSampleRate: number; sendDefaultPii: boolean }) => void;
+  init: (opts: { dsn: string; tracesSampleRate: number; sendDefaultPii: boolean; environment?: string; release?: string }) => void;
   startSpan: <T>(ctx: SpanCtx, fn: () => Promise<T>) => Promise<T>;
+  captureException: (err: unknown, opts?: { contexts?: Record<string, unknown> }) => void;
+  captureMessage: (msg: string, level?: "fatal" | "error" | "warning" | "info" | "debug") => void;
+  setTag: (key: string, value: string) => void;
 };
 
 let mod: SentryModule | null = null;
 let probePromise: Promise<void> | null = null;
+let initialized = false;
+
+const PACKAGE_VERSION = (() => {
+  try {
+    return require("../package.json").version;
+  } catch {
+    return "unknown";
+  }
+})();
 
 async function probe(): Promise<void> {
   if (!probePromise) {
@@ -29,8 +49,17 @@ async function probe(): Promise<void> {
         const dsn = process.env.PHANTOM_SENTRY_DSN ?? cfg.sentryDsn;
         if (!dsn) return;
         const m = (await import("@sentry/node")) as unknown as SentryModule;
-        m.init({ dsn, tracesSampleRate: 1.0, sendDefaultPii: false });
+        m.init({
+          dsn,
+          tracesSampleRate: 1.0,
+          sendDefaultPii: false,
+          environment: process.env.NODE_ENV ?? "production",
+          release: `phantom-troupe@${PACKAGE_VERSION}`,
+        });
+        m.setTag("component", "phantom-cli");
+        m.setTag("provider", cfg.provider);
         mod = m;
+        initialized = true;
       } catch {
         mod = null; // no DSN, no SDK installed, or init refused — carry on bare
       }
@@ -44,6 +73,11 @@ export function initSentry(): void {
   void probe();
 }
 
+/** Whether Sentry is actually initialized and sending. */
+export function isSentryReady(): boolean {
+  return initialized && mod != null;
+}
+
 /** Run work inside a span when Sentry is present; otherwise just run it. */
 export async function traced<T>(op: string, name: string, fn: () => Promise<T>): Promise<T> {
   await probe();
@@ -51,7 +85,34 @@ export async function traced<T>(op: string, name: string, fn: () => Promise<T>):
   try {
     return await mod.startSpan({ op, name }, async () => fn());
   } catch (err) {
-    // the work itself threw — surface it untouched
+    // surface the work's own error untouched, but also capture it in Sentry
+    try {
+      mod.captureException(err, { contexts: { operation: { op, name } } });
+    } catch {
+      /* sentry itself failed — ignore */
+    }
     throw err;
+  }
+}
+
+/** Capture a one-off error (e.g. daemon crash, hook failure). */
+export function captureError(err: unknown, ctx?: Record<string, unknown>): void {
+  void probe();
+  if (!mod) return;
+  try {
+    mod.captureException(err, { contexts: ctx ? { extra: ctx } : undefined });
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Capture a one-off message (e.g. séance completed, nightly sweep). */
+export function captureMessage(msg: string, level: "fatal" | "error" | "warning" | "info" | "debug" = "info"): void {
+  void probe();
+  if (!mod) return;
+  try {
+    mod.captureMessage(msg, level);
+  } catch {
+    /* ignore */
   }
 }

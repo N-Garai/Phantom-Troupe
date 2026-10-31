@@ -37,6 +37,8 @@ export type Config = {
   keepWakeWord: boolean;
   /** optional: sentry DSN for the tool's own crash telemetry (off by default) */
   sentryDsn?: string;
+  /** Gemma API key when provider is gemma-api (stored locally, never leaves your machine) */
+  gemmaApiKey?: string;
 };
 
 export const DEFAULT_CONFIG: Config = {
