@@ -11,6 +11,7 @@ import { Zombie } from "./zombie";
 import { Spirits } from "./spirits";
 import { Bats } from "./bats";
 import { Smoke } from "./smoke";
+import { Moon } from "./moon";
 
 /** Hero: a living 3D graveyard — cursor-parallax world, shambling dead,
  *  a hand that claws out of its grave, roaming spirits, bats over the moon. */
@@ -48,38 +49,37 @@ export function Hero() {
       className="relative flex min-h-[100svh] items-center justify-center overflow-hidden"
       style={{ ["--mx" as string]: 0, ["--my" as string]: 0, ["--sy" as string]: 0 }}
     >
-      {/* sky */}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,#020105_0%,#0a0616_38%,#120a20_62%,#050309_100%)]" />
+      {/* deep void sky */}
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,#010003_0%,#040208_25%,#080514_55%,#050309_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(109,75,180,0.14),transparent_60%)]" />
+
       {/* moon — pockmarked, halo breathing, crossed by a slow cloud */}
-      <div
-        className="absolute right-[12%] top-[12%] h-28 w-28 rounded-full sm:h-40 sm:w-40"
+      <Moon
+        className="absolute right-[11%] top-[10%] h-30 w-30 rounded-full sm:h-44 sm:w-44"
         style={{
-          background: "radial-gradient(circle at 38% 34%, #fdf6e3 0%, #e7d9b8 45%, #b9a67e 100%)",
-          boxShadow: "0 0 60px 18px rgba(255, 236, 190, 0.22), 0 0 160px 60px rgba(247,155,46,0.10)",
-          transform: "translate3d(calc(var(--mx) * -14px), calc(var(--my) * -10px + var(--sy) * -0.06px), 0)",
+          boxShadow:
+            "0 0 70px 24px rgba(255, 236, 190, 0.18), 0 0 180px 80px rgba(247,155,46,0.08)",
+          transform: "translate3d(calc(var(--mx) * -16px), calc(var(--my) * -12px + var(--sy) * -0.07px), 0)",
         }}
-        aria-hidden
-      >
-        {/* craters */}
-        <span className="absolute left-[22%] top-[30%] h-[14%] w-[14%] rounded-full bg-[rgba(146,127,94,0.4)]" />
-        <span className="absolute left-[56%] top-[22%] h-[9%] w-[9%] rounded-full bg-[rgba(146,127,94,0.35)]" />
-        <span className="absolute left-[48%] top-[58%] h-[18%] w-[18%] rounded-full bg-[rgba(146,127,94,0.28)]" />
-        <span className="absolute left-[26%] top-[64%] h-[8%] w-[8%] rounded-full bg-[rgba(146,127,94,0.32)]" />
-      </div>
+      />
       <div
-        className="moon-halo absolute right-[10%] top-[9%] h-44 w-44 rounded-full bg-[radial-gradient(circle,rgba(253,246,227,0.10),transparent_62%)] blur-md sm:h-64 sm:w-64"
+        className="moon-halo absolute right-[7%] top-[6%] h-52 w-52 rounded-full blur-2xl sm:h-64 sm:w-64"
+        style={{
+          background: "radial-gradient(circle, rgba(253,246,227,0.14), transparent 62%)",
+          opacity: 0.8,
+        }}
         aria-hidden
       />
       {/* a slow cloud wisp crossing the moon's face */}
-      <div className="absolute right-[4%] top-[10%] h-40 w-72 overflow-hidden sm:h-56 sm:w-96" aria-hidden>
+      <div className="absolute right-[3%] top-[8%] h-44 w-80 overflow-hidden sm:h-60 sm:w-104" aria-hidden>
         <div
-          className="moon-wisp absolute left-0 top-[30%] h-10 w-full rounded-full bg-[rgba(8,5,18,0.55)] blur-xl sm:h-14"
-          style={{ transform: "translateX(-160%)" }}
+          className="moon-wisp absolute left-0 top-[30%] h-12 w-full rounded-full bg-[rgba(6,4,12,0.72)] blur-3xl sm:h-16"
+          style={{ transform: "translateX(-170%)" }}
         />
       </div>
 
-      {/* a spider, patient on its thread */}
-      <div className="absolute right-[24%] top-0 z-[2] hidden origin-top lg:block" aria-hidden>
+      {/* a patient spider on its thread */}
+      <div className="absolute right-[22%] top-0 z-[2] hidden origin-top lg:block" aria-hidden>
         <svg viewBox="0 0 60 130" className="spider-sway h-32 w-14">
           <line x1="30" y1="0" x2="30" y2="86" stroke="#97907f" strokeWidth="0.7" opacity="0.5" />
           <g transform="translate(30 96)">
@@ -95,19 +95,19 @@ export function Hero() {
         </svg>
       </div>
 
-      {/* bat colony crossing the moon */}
-      <Bats className="absolute right-[16%] top-[14%] z-[1] h-24 w-[60vw]" />
+      {/* bat colony crossing the moon — denser, creepier */}
+      <Bats className="absolute right-[14%] top-[12%] z-[1] h-24 w-[70vw]" />
 
       {/* fog */}
       <div className="fog-layer" aria-hidden />
       <div className="fog-layer fog-2" aria-hidden />
       {/* rolling smoke banks — cinematic, low, slow */}
       <Smoke
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[46%] w-full"
-        density={14}
-        tint="rgba(168,158,205,0.09)"
-        rise={0.3}
-        speed={0.9}
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[48%] w-full"
+        density={20}
+        tint="rgba(150,140,190,0.11)"
+        rise={0.35}
+        speed={1}
         fromBottom
       />
 
@@ -115,45 +115,51 @@ export function Hero() {
       <GraveyardScene />
 
       {/* the shambling dead — walks behind the iron fence */}
-      <div className="absolute inset-x-0 bottom-0 z-[1] h-[30%]" aria-hidden>
-        <Zombie size={104} bottom="12%" delay={2} />
+      <div className="absolute inset-x-0 bottom-0 z-[1] h-[32%]" aria-hidden>
+        <Zombie size={112} bottom="11%" delay={1.5} />
+        <Zombie size={80} bottom="13%" delay={9} className="opacity-60" />
       </div>
 
       {/* iron fence in front of everything that moves below it */}
-      <div className="absolute inset-x-0 bottom-0 z-[2] h-[26%]">
+      <div className="absolute inset-x-0 bottom-0 z-[2] h-[28%]">
         <GraveyardFence />
       </div>
 
       {/* the dead man's hand — hover to raise it, click to sit at the séance */}
-      <div className="absolute bottom-[4%] left-[7%] z-[3] hidden h-44 w-36 sm:block md:left-[11%]">
+      <div className="absolute bottom-[3%] left-[6%] z-[3] hidden h-48 w-40 sm:block md:left-[10%]">
         <RisingHand className="h-full w-full" />
       </div>
 
       {/* ground fog + vignette */}
-      <div className="pointer-events-none absolute bottom-0 left-0 z-[3] h-40 w-full bg-[linear-gradient(180deg,transparent,rgba(5,3,9,0.9))]" aria-hidden />
+      <div className="pointer-events-none absolute bottom-0 left-0 z-[3] h-48 w-full bg-[linear-gradient(180deg,transparent,rgba(5,3,9,0.92))]" aria-hidden />
       <div className="vignette pointer-events-none absolute inset-0 z-[3]" aria-hidden />
 
       {/* embers + roaming spirits */}
-      <Particles className="pointer-events-none absolute inset-0 z-[4] h-full w-full" density={140} />
-      <Spirits className="pointer-events-none absolute inset-0 z-[4] h-full w-full" count={14} graveSpawn={0.55} />
+      <Particles className="pointer-events-none absolute inset-0 z-[4] h-full w-full" density={160} />
+      <Spirits className="pointer-events-none absolute inset-0 z-[4] h-full w-full" count={16} graveSpawn={0.55} />
 
       {/* film grain — the whole graveyard breathes through old celluloid */}
       <div className="film-grain film-grain-soft pointer-events-none absolute inset-0 z-[5]" aria-hidden />
 
-      {/* ghosts — now with real 3D tilt */}
+      {/* ghosts — spectral, 3D tilt */}
       <Ghost
-        parallax={22}
-        className="pointer-events-none absolute left-[8%] top-[22%] z-[4] w-24 opacity-70 sm:left-[14%] sm:w-32 md:w-40"
+        parallax={24}
+        className="pointer-events-none absolute left-[9%] top-[24%] z-[4] w-28 opacity-75 sm:left-[14%] sm:w-36 md:w-44"
         aria-hidden
       />
       <Ghost
-        parallax={34}
-        className="pointer-events-none absolute right-[7%] top-[40%] z-[4] w-14 opacity-40 sm:w-20"
+        parallax={36}
+        className="pointer-events-none absolute right-[8%] top-[38%] z-[4] w-16 opacity-50 sm:w-22 md:w-28"
         aria-hidden
       />
       <Ghost
-        parallax={12}
-        className="pointer-events-none absolute left-[38%] top-[14%] z-[4] hidden w-10 opacity-25 lg:block"
+        parallax={14}
+        className="pointer-events-none absolute left-[40%] top-[16%] z-[4] hidden w-12 opacity-30 lg:block"
+        aria-hidden
+      />
+      <Ghost
+        parallax={20}
+        className="pointer-events-none absolute right-[30%] top-[55%] z-[4] hidden w-10 opacity-28 lg:block"
         aria-hidden
       />
 
@@ -165,22 +171,22 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.8 }}
-          className="mb-5 font-[family-name:var(--font-geist-mono)] text-[11px] uppercase tracking-[0.5em] text-ash sm:text-xs"
+          transition={{ delay: 0.3, duration: 0.9 }}
+          className="mb-5 font-[family-name:var(--font-geist-mono)] text-[11px] uppercase tracking-[0.6em] text-ash sm:text-xs"
         >
           your terminal is a haunted house
         </motion.p>
 
-        <h1 className="glitch-hover relative font-[family-name:var(--font-cinzel)] text-[13vw] font-black leading-[0.95] text-bone sm:text-7xl md:text-8xl">
-          <span className="glitch-a block"><SplitText text="PHANTOM" delay={0.3} /></span>
-          <span className="glitch-b mt-1 block text-marigold text-glow-marigold"><SplitText text="TROUPE" delay={0.65} /></span>
+        <h1 className="glitch-hover relative font-[family-name:var(--font-cinzel)] text-[14vw] font-black leading-[0.92] text-bone sm:text-7xl md:text-8xl lg:text-9xl">
+          <span className="glitch-a block"><SplitText text="PHANTOM" delay={0.35} /></span>
+          <span className="glitch-b mt-1 block text-marigold text-glow-marigold"><SplitText text="TROUPE" delay={0.75} /></span>
         </h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.15, duration: 0.8 }}
-          className="mx-auto mt-6 max-w-2xl text-balance text-base leading-relaxed text-ash sm:text-lg"
+          transition={{ delay: 1.25, duration: 0.9 }}
+          className="mx-auto mt-7 max-w-2xl text-balance text-base leading-relaxed text-ash sm:text-lg"
         >
           A troupe of local AI agents that haunts your shell — autopsying failed commands,
           burying dead scripts, and <span className="text-spectre">resurrecting the ones you still need</span>.
@@ -188,20 +194,20 @@ export function Hero() {
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.35, duration: 0.8 }}
-          className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+          transition={{ delay: 1.5, duration: 0.9 }}
+          className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
         >
           <a
             href="#download"
-            className="pulse-ring w-full rounded-md bg-marigold px-7 py-3.5 font-[family-name:var(--font-geist-mono)] text-sm font-bold uppercase tracking-widest text-void transition-all hover:bg-candle sm:w-auto"
+            className="pulse-ring w-full rounded-md bg-marigold px-8 py-4 font-[family-name:var(--font-geist-mono)] text-sm font-bold uppercase tracking-widest text-void transition-all hover:bg-candle sm:w-auto"
           >
             Summon it — one line
           </a>
           <a
             href="#seance"
-            className="w-full rounded-md border border-border px-7 py-3.5 font-[family-name:var(--font-geist-mono)] text-sm uppercase tracking-widest text-bone transition-all hover:border-marigold/60 hover:text-marigold sm:w-auto"
+            className="w-full rounded-md border border-border px-8 py-4 font-[family-name:var(--font-geist-mono)] text-sm uppercase tracking-widest text-bone transition-all hover:border-marigold/60 hover:text-marigold sm:w-auto"
           >
             Enter the graveyard
           </a>
@@ -210,8 +216,8 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.8, duration: 1 }}
-          className="mt-10 font-[family-name:var(--font-geist-mono)] text-xs text-ash/70"
+          transition={{ delay: 2, duration: 1 }}
+          className="mt-12 font-[family-name:var(--font-geist-mono)] text-xs text-ash/60"
         >
           <span className="text-spectre">$</span> phantom <span className="blink-caret text-marigold">▌</span>
         </motion.div>
@@ -221,14 +227,14 @@ export function Hero() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 1 }}
-        className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2"
+        transition={{ delay: 2.4, duration: 1 }}
+        className="absolute bottom-7 left-1/2 z-10 -translate-x-1/2"
         aria-hidden
       >
         <div className="flex h-10 w-6 items-start justify-center rounded-full border border-ash/40 p-1.5">
           <motion.div
-            animate={{ y: [0, 14, 0], opacity: [1, 0.3, 1] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [0, 16, 0], opacity: [1, 0.3, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             className="h-2 w-1 rounded-full bg-marigold"
           />
         </div>

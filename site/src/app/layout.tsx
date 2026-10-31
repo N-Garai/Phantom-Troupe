@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Cinzel } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { MotionProvider } from "@/components/phantom/motion-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -51,10 +52,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        {/* ?motion=full — preview every animation even when the OS asks for reduced motion */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(new URLSearchParams(location.search).get("motion")==="full"){document.documentElement.setAttribute("data-motion-full","");}`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased bg-background text-foreground noise`}
       >
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <Toaster />
       </body>
     </html>

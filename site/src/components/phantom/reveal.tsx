@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
 type RevealProps = {
@@ -11,13 +11,12 @@ type RevealProps = {
   once?: boolean;
 };
 
-/** Scroll-reveal wrapper: fades + rises into view (respects reduced motion). */
+/** Scroll-reveal wrapper: fades + rises into view (MotionConfig honors reduced motion). */
 export function Reveal({ children, delay = 0, y = 28, className, once = true }: RevealProps) {
-  const reduce = useReducedMotion();
   return (
     <motion.div
       className={className}
-      initial={reduce ? false : { opacity: 0, y, filter: "blur(6px)" }}
+      initial={{ opacity: 0, y, filter: "blur(6px)" }}
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once, margin: "-12% 0px" }}
       transition={{ duration: 0.7, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
@@ -36,7 +35,6 @@ type SplitTextProps = {
 
 /** Zentry-style per-character reveal for display headings. */
 export function SplitText({ text, className, stagger = 0.035, delay = 0 }: SplitTextProps) {
-  const reduce = useReducedMotion();
   const chars = Array.from(text);
   return (
     <span className={className} aria-label={text} role="text">
@@ -45,7 +43,7 @@ export function SplitText({ text, className, stagger = 0.035, delay = 0 }: Split
           key={i}
           aria-hidden
           className="inline-block will-change-transform"
-          initial={reduce ? false : { opacity: 0, y: "0.7em", rotateX: 55, filter: "blur(8px)" }}
+          initial={{ opacity: 0, y: "0.7em", rotateX: 55, filter: "blur(8px)" }}
           animate={{ opacity: 1, y: 0, rotateX: 0, filter: "blur(0px)" }}
           transition={{
             duration: 0.75,

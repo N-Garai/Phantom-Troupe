@@ -136,15 +136,15 @@
   inset: -20% -10%;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 45% 30% at 20% 80%, rgba(157, 140, 200, 0.10), transparent 70%),
-    radial-gradient(ellipse 40% 26% at 75% 70%, rgba(247, 155, 46, 0.07), transparent 70%);
-  filter: blur(2px);
+    radial-gradient(ellipse 45% 30% at 20% 80%, rgba(157, 140, 200, 0.12), transparent 70%),
+    radial-gradient(ellipse 40% 26% at 75% 70%, rgba(247, 155, 46, 0.09), transparent 70%);
+  filter: blur(3px);
   animation: fog-drift 26s ease-in-out infinite alternate;
 }
 .fog-layer.fog-2 {
   animation-duration: 38s;
   animation-delay: -12s;
-  opacity: 0.7;
+  opacity: 0.75;
   transform: scaleX(-1);
 }
 @keyframes fog-drift {
@@ -153,8 +153,42 @@
   100% { transform: translate3d(-2%, 2%, 0) scale(1.02); }
 }
 
+/* stronger atmospheric haze for section backdrops */
+.haze-band {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(5, 3, 9, 0.6) 0%, transparent 30%, transparent 70%, rgba(5, 3, 9, 0.55) 100%);
+  pointer-events: none;
+}
+
+/* blood-drip accent for headings */
+.blood-drip {
+  position: relative;
+  display: inline-block;
+}
+.blood-drip::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent 0%, #c22836 30%, #c22836 70%, transparent 100%);
+  filter: blur(1px);
+  opacity: 0.7;
+}
+
+/* vignette */
+.vignette {
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.65) 100%);
+}
+
 .text-glow-marigold {
   text-shadow: 0 0 24px rgba(247, 155, 46, 0.45), 0 0 64px rgba(247, 155, 46, 0.18);
+}
+.text-glow-bone {
+  text-shadow: 0 0 26px rgba(233, 225, 210, 0.32), 0 0 72px rgba(233, 225, 210, 0.12);
 }
 .text-glow-spectre {
   text-shadow: 0 0 18px rgba(116, 242, 164, 0.4), 0 0 48px rgba(116, 242, 164, 0.15);
@@ -633,6 +667,30 @@
   filter: drop-shadow(0 0 14px rgba(116, 242, 164, 0.5));
   animation: loader-glow-pulse 2.2s ease-in-out infinite;
 }
+/* a slower, more cinematic claw-through */
+.loader-stage .loader-hand {
+  animation-duration: 1.15s;
+}
+/* static mound halves; heave apart only when the loader-mound classes land */
+.grave-mound-half {
+  will-change: transform;
+}
+
+/* wisps that carry the dissolved name upward like breath on cold air */
+.smoke-wisp {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(178, 168, 208, 0.42), rgba(150, 140, 190, 0.16) 55%, transparent 72%);
+  filter: blur(10px);
+  opacity: 0;
+  animation: smoke-out-wisp 2.1s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes smoke-out-wisp {
+  0% { opacity: 0; transform: translateY(14px) scale(0.5); }
+  22% { opacity: 0.85; transform: translateY(-26px) scale(1.2); }
+  100% { opacity: 0; transform: translateY(-160px) scale(2.2); }
+}
 @keyframes loader-glow-pulse {
   0%, 100% { filter: drop-shadow(0 0 10px rgba(116, 242, 164, 0.35)); }
   50% { filter: drop-shadow(0 0 22px rgba(116, 242, 164, 0.7)); }
@@ -736,6 +794,77 @@
   100% { opacity: 0; transform: translateX(-50%) scale(1.5); }
 }
 
+/* ================= smoke puffs for loading screen ================= */
+/* layered radial densities + turbulence-displaced edges + screen blending,
+   so each puff reads as lit vapor instead of a gray balloon */
+.smoke-puff {
+  position: absolute;
+  border-radius: 58% 42% 55% 45% / 52% 58% 42% 48%;
+  background:
+    radial-gradient(ellipse 62% 58% at 34% 44%, rgba(168, 156, 210, 0.2), transparent 66%),
+    radial-gradient(ellipse 52% 64% at 68% 58%, rgba(146, 132, 192, 0.16), transparent 68%),
+    radial-gradient(ellipse 74% 48% at 50% 30%, rgba(196, 178, 226, 0.1), transparent 72%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  filter: blur(12px);
+  filter: blur(12px) url(#smoke-turb);
+  animation: smoke-drift forwards;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+@keyframes smoke-drift {
+  0% {
+    opacity: 0;
+    transform: scale(0.45) rotate(var(--rot, 0deg)) translate3d(0, 30px, 0);
+  }
+  14% {
+    opacity: 0.55;
+    transform: scale(1) rotate(var(--rot, 0deg)) translate3d(-10px, 2px, 0);
+  }
+  38% {
+    opacity: 0.36;
+    transform: scale(1.14) rotate(var(--rot, 0deg)) translate3d(18px, -22px, 0);
+  }
+  64% {
+    opacity: 0.22;
+    transform: scale(1.3) rotate(var(--rot, 0deg)) translate3d(-14px, -46px, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5) rotate(var(--rot, 0deg)) translate3d(30px, -72px, 0);
+  }
+}
+
+/* ================= bats moving toward the screen ================= */
+.bat-toward {
+  position: absolute;
+  opacity: 0;
+  animation: bat-swoop both;
+  pointer-events: none;
+}
+@keyframes bat-swoop {
+  0% {
+    opacity: 0;
+    transform: scale(0) translate3d(0, 0, 600px) rotateY(0deg);
+  }
+  12% {
+    opacity: 0.85;
+    transform: scale(0.6) translate3d(0, -10px, 400px) rotateY(8deg);
+  }
+  38% {
+    opacity: 0.95;
+    transform: scale(1) translate3d(-2vw, 6px, 180px) rotateY(-6deg);
+  }
+  62% {
+    opacity: 0.7;
+    transform: scale(0.85) translate3d(-4vw, -4px, 90px) rotateY(12deg);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1.1) translate3d(-6vw, 8px, 0px) rotateY(-4deg);
+  }
+}
+
 /* ===================== cinematic layer: grain · flicker · creature detail ===================== */
 
 /* film grain — an SVG turbulence tile, jumped frame-by-frame like celluloid */
@@ -814,19 +943,33 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fog-layer, .ghost-float, .animate-marquee, .candle-flicker, .pulse-ring, .ascension,
-  .hand-riser, .hand-finger, .hand-dirt, .hand-bone-glow, .gy-candle-glow,
-  .zombie-cross, .zombie-bob, .zombie-leg-a, .zombie-leg-b, .zombie-arm-front,
-  .zombie-arm-back, .zombie-head, .zombie-eye, .zombie-coat,
-  .bat-path, .bat-wave, .bat-flap, .ghost-tilt, .ghost-glow-pulse,
-  .loader-hand, .loader-crack path, .loader-mound-l, .loader-mound-r,
-  .loader-clod, .loader-shake, .loader-flash, .loader-hand-glow,
-  .film-grain, .loader-flicker, .moon-halo, .moon-wisp, .spider-sway, .pumpkin-glow {
+  html:not([data-motion-full]) .fog-layer, html:not([data-motion-full]) .ghost-float,
+  html:not([data-motion-full]) .animate-marquee, html:not([data-motion-full]) .candle-flicker,
+  html:not([data-motion-full]) .pulse-ring, html:not([data-motion-full]) .ascension,
+  html:not([data-motion-full]) .hand-riser, html:not([data-motion-full]) .hand-finger,
+  html:not([data-motion-full]) .hand-dirt, html:not([data-motion-full]) .hand-bone-glow,
+  html:not([data-motion-full]) .gy-candle-glow,
+  html:not([data-motion-full]) .zombie-cross, html:not([data-motion-full]) .zombie-bob,
+  html:not([data-motion-full]) .zombie-leg-a, html:not([data-motion-full]) .zombie-leg-b,
+  html:not([data-motion-full]) .zombie-arm-front,
+  html:not([data-motion-full]) .zombie-arm-back, html:not([data-motion-full]) .zombie-head,
+  html:not([data-motion-full]) .zombie-eye, html:not([data-motion-full]) .zombie-coat,
+  html:not([data-motion-full]) .bat-path, html:not([data-motion-full]) .bat-wave,
+  html:not([data-motion-full]) .bat-flap, html:not([data-motion-full]) .ghost-tilt,
+  html:not([data-motion-full]) .ghost-glow-pulse,
+  html:not([data-motion-full]) .loader-hand, html:not([data-motion-full]) .loader-crack path,
+  html:not([data-motion-full]) .loader-mound-l, html:not([data-motion-full]) .loader-mound-r,
+  html:not([data-motion-full]) .loader-clod, html:not([data-motion-full]) .loader-shake,
+  html:not([data-motion-full]) .loader-flash, html:not([data-motion-full]) .loader-hand-glow,
+  html:not([data-motion-full]) .film-grain, html:not([data-motion-full]) .loader-flicker,
+  html:not([data-motion-full]) .moon-halo, html:not([data-motion-full]) .moon-wisp,
+  html:not([data-motion-full]) .spider-sway, html:not([data-motion-full]) .pumpkin-glow {
     animation: none !important;
   }
-  .hand-dirt, .loader-clod { opacity: 0 !important; }
-  .loader-hand-wait { opacity: 0 !important; }
-  .loader-hand { transform: translateX(-50%) translateY(0); opacity: 1; }
+  html:not([data-motion-full]) .hand-dirt,
+  html:not([data-motion-full]) .loader-clod { opacity: 0 !important; }
+  html:not([data-motion-full]) .loader-hand-wait { opacity: 0 !important; }
+  html:not([data-motion-full]) .loader-hand { transform: translateX(-50%) translateY(0); opacity: 1; }
   html { scroll-behavior: auto; }
 }
 
@@ -1491,17 +1634,28 @@
 /* ------------------- reduced motion: still dioramas ---------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .ss-ground-glow, .ss-ground-rows, .ss-crack-path, .ss-mound-l, .ss-mound-r,
-  .ss-corpse, .ss-corpse-sway, .ss-clod, .ss-dust, .ss-grave-wisp, .ss-burst-glow,
-  .ss-house-shiver, .ss-house-glow, .ss-window, .ss-bat-out, .ss-bat-out-wave,
-  .ss-star, .ss-moon-halo, .ss-cloud, .ss-moon-ghost, .ss-ember,
-  .ss-lamp-halo, .ss-lightning, .ss-walk-glow, .ss-halo-breathe {
+  html:not([data-motion-full]) .ss-ground-glow, html:not([data-motion-full]) .ss-ground-rows,
+  html:not([data-motion-full]) .ss-crack-path, html:not([data-motion-full]) .ss-mound-l,
+  html:not([data-motion-full]) .ss-mound-r,
+  html:not([data-motion-full]) .ss-corpse, html:not([data-motion-full]) .ss-corpse-sway,
+  html:not([data-motion-full]) .ss-clod, html:not([data-motion-full]) .ss-dust,
+  html:not([data-motion-full]) .ss-grave-wisp, html:not([data-motion-full]) .ss-burst-glow,
+  html:not([data-motion-full]) .ss-house-shiver, html:not([data-motion-full]) .ss-house-glow,
+  html:not([data-motion-full]) .ss-window, html:not([data-motion-full]) .ss-bat-out,
+  html:not([data-motion-full]) .ss-bat-out-wave,
+  html:not([data-motion-full]) .ss-star, html:not([data-motion-full]) .ss-moon-halo,
+  html:not([data-motion-full]) .ss-cloud, html:not([data-motion-full]) .ss-moon-ghost,
+  html:not([data-motion-full]) .ss-ember,
+  html:not([data-motion-full]) .ss-lamp-halo, html:not([data-motion-full]) .ss-lightning,
+  html:not([data-motion-full]) .ss-walk-glow, html:not([data-motion-full]) .ss-halo-breathe {
     animation: none !important;
   }
   /* freeze each world at its most photogenic moment */
-  .ss-corpse { transform: translateX(-50%) translateY(10%); }
-  .ss-crack-path { stroke-dashoffset: 0; }
-  .ss-clod, .ss-bat-out, .ss-grave-wisp, .ss-dust, .ss-lightning, .ss-moon-ghost { opacity: 0 !important; }
-  .ss-star { opacity: 0.8; }
-  .ss-cloud { transform: translateX(24%) scale(var(--cs, 1)); }
+  html:not([data-motion-full]) .ss-corpse { transform: translateX(-50%) translateY(10%); }
+  html:not([data-motion-full]) .ss-crack-path { stroke-dashoffset: 0; }
+  html:not([data-motion-full]) .ss-clod, html:not([data-motion-full]) .ss-bat-out,
+  html:not([data-motion-full]) .ss-grave-wisp, html:not([data-motion-full]) .ss-dust,
+  html:not([data-motion-full]) .ss-lightning, html:not([data-motion-full]) .ss-moon-ghost { opacity: 0 !important; }
+  html:not([data-motion-full]) .ss-star { opacity: 0.8; }
+  html:not([data-motion-full]) .ss-cloud { transform: translateX(24%) scale(var(--cs, 1)); }
 }

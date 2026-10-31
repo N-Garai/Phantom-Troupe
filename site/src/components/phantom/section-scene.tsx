@@ -134,9 +134,17 @@ function MoonGhost({ top, dur, delay, size = 64 }: { top: string; dur: number; d
           </linearGradient>
         </defs>
         <path d="M60 8 C26 8 8 38 10 74 C11 96 18 108 14 122 C22 114 30 118 34 128 C40 118 50 122 56 132 C62 122 72 120 78 130 C84 120 94 116 104 124 C100 110 94 100 94 84 C96 44 88 8 60 8 Z" fill="url(#ss-moon-ghost-body)" />
-        <ellipse cx="44" cy="52" rx="5.5" ry="9" fill="#050309" opacity="0.8" />
-        <ellipse cx="76" cy="52" rx="5.5" ry="9" fill="#050309" opacity="0.8" />
-        <path d="M50 76 Q60 86 70 76" stroke="#050309" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />
+        {/* angry slanted sockets */}
+        <ellipse cx="44" cy="52" rx="5.5" ry="9" fill="#050309" opacity="0.85" transform="rotate(-16 44 52)" />
+        <ellipse cx="76" cy="52" rx="5.5" ry="9" fill="#050309" opacity="0.85" transform="rotate(16 76 52)" />
+        <circle cx="46" cy="54" r="1.4" fill="#74f2a4" opacity="0.85" />
+        <circle cx="74" cy="54" r="1.4" fill="#74f2a4" opacity="0.85" />
+        {/* jagged little maw */}
+        <path d="M48 74 Q60 84 72 74 L68 88 Q60 94 52 88 Z" fill="#050309" opacity="0.85" />
+        <g fill="#e9e1d2" opacity="0.85">
+          <path d="M53 76 L55 83 L58 76 Z" />
+          <path d="M63 80 L65 87 L68 80 Z" />
+        </g>
       </svg>
     </div>
   );

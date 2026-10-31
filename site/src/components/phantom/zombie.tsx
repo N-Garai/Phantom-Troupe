@@ -13,14 +13,14 @@ type ZombieProps = {
 };
 
 /**
- * A shambling zombie silhouette. Walks the whole graveyard left → right,
- * stops mid-way to reconsider its unlifes, then shambles on. Fully
- * articulated: swinging legs, reaching arm, lolling head, guttering eye.
+ * A shambling zombie corpse. Fully articulated: swinging legs, hunched
+ * torso, reaching arm, lolling head, guttering eye, ragged coat. Walks
+ * left → right across the graveyard then sinks back into the earth.
  */
 export function Zombie({
   className,
   size = 120,
-  bottom = "6.5%",
+  bottom = "6%",
   walk = true,
   delay = 0,
 }: ZombieProps) {
@@ -32,10 +32,10 @@ export function Zombie({
     >
       <div className={walk ? "zombie-cross" : ""} style={walk ? { animationDelay: `${delay}s` } : undefined}>
         <div className="zombie-bob">
-          <svg viewBox="0 0 130 170" className="h-auto w-full">
+          <svg viewBox="0 0 150 200" className="h-auto w-full">
             <defs>
-              <filter id="z-eye-glow" x="-120%" y="-120%" width="340%" height="340%">
-                <feGaussianBlur stdDeviation="2.2" result="b" />
+              <filter id="z-eye-glow2" x="-150%" y="-150%" width="400%" height="400%">
+                <feGaussianBlur stdDeviation="3" result="b" />
                 <feMerge>
                   <feMergeNode in="b" />
                   <feMergeNode in="SourceGraphic" />
@@ -43,50 +43,55 @@ export function Zombie({
               </filter>
             </defs>
 
-            <g fill="#0a0614">
+            <g fill="#060410">
               {/* back leg */}
               <g className="zombie-leg-b">
-                <path d="M76 108 L82 134 L76 158 L70 158 L74 134 L66 110 Z" />
-                <path d="M70 156 h16 l2 6 h-20 z" />
+                <path d="M86 128 L94 160 L88 186 L80 186 L84 160 L74 130 Z" />
+                <path d="M78 184 h20 l4 8 h-28 z" />
               </g>
 
               {/* ragged coat tail flapping behind the hips */}
               <g className="zombie-coat">
-                <path d="M52 100 L38 128 L46 130 L40 148 L50 144 L48 162 L56 156 L58 104 Z" />
+                <path d="M58 120 L42 154 L52 156 L44 176 L58 172 L56 190 L66 182 L68 124 Z" />
+                <path d="M44 156 Q48 136 56 140 Q52 148 46 152" fill="none" stroke="#0a0614" strokeWidth="1.5" opacity="0.6" />
               </g>
 
-              {/* torso — hunched forward toward the right */}
-              <path d="M50 104 C46 84 50 64 62 54 L84 58 C92 70 94 88 90 106 C78 112 62 112 50 104 Z" />
+              {/* hunched torso */}
+              <path d="M56 124 C52 102 56 82 70 72 L96 78 C106 92 108 108 104 124 C90 132 70 132 56 124 Z" />
+              {/* ribcage suggestion */}
+              <path d="M68 84 Q74 82 80 84 M70 92 Q76 90 82 92 M72 100 Q78 98 84 100" fill="none" stroke="#2a2036" strokeWidth="2" opacity="0.7" />
 
               {/* front leg */}
               <g className="zombie-leg-a">
-                <path d="M58 106 L54 132 L58 156 L64 156 L62 132 L70 108 Z" />
-                <path d="M56 154 h18 l2 6 h-22 z" />
+                <path d="M68 126 L62 154 L68 182 L76 182 L72 154 L82 128 Z" />
+                <path d="M64 180 h22 l4 8 h-30 z" />
               </g>
 
-              {/* back arm, dangling and useless */}
+              {/* back arm, dangling */}
               <g className="zombie-arm-back">
-                <path d="M60 62 C52 72 48 86 48 98 L54 100 C56 88 60 76 66 66 Z" />
-                <path d="M47 98 l9 2 -2 7 -9 -2 z" />
+                <path d="M68 76 C58 88 52 104 52 120 L60 124 C62 110 66 96 72 84 Z" />
+                <path d="M51 120 l12 2 -4 8 -12 -2 z" fill="#0a0614" />
               </g>
 
-              {/* head — tilted, jaw hanging open */}
+              {/* head — tilted, jaw hanging open, decayed */}
               <g className="zombie-head">
-                <path d="M78 26 C90 26 97 34 96 44 C95 52 88 57 79 57 C70 57 64 50 65 41 C66 32 70 26 78 26 Z" />
+                <path d="M88 32 C102 32 110 42 108 54 C106 64 98 70 88 70 C80 70 74 62 76 50 C78 38 84 32 88 32 Z" />
                 {/* hanging jaw */}
-                <path d="M72 52 L84 53 L83 62 L74 61 Z" />
-                {/* a few scalp strands */}
-                <path d="M70 28 l-5 -7 M76 26 l-2 -8 M83 26 l2 -7" stroke="#0a0614" strokeWidth="2.4" strokeLinecap="round" />
-                {/* guttering eye */}
-                <circle className="zombie-eye" cx="88" cy="40" r="2.6" fill="#74f2a4" filter="url(#z-eye-glow)" />
-                <circle cx="78" cy="42" r="1.6" fill="#74f2a4" opacity="0.5" />
+                <path d="M82 64 L98 66 L96 76 L86 74 Z" fill="#0a0614" />
+                {/* scalp strands */}
+                <path d="M80 34 l-6 -9 M88 32 l-2 -10 M94 32 l2 -8" stroke="#060410" strokeWidth="2.8" strokeLinecap="round" />
+                {/* guttering eye — sickly green */}
+                <circle className="zombie-eye" cx="100" cy="46" r="3" fill="#74f2a4" filter="url(#z-eye-glow2)" />
+                <circle cx="90" cy="48" r="2" fill="#74f2a4" opacity="0.5" />
+                {/* decay patches */}
+                <ellipse cx="96" cy="52" rx="4" ry="3" fill="#0a0614" opacity="0.4" />
               </g>
 
               {/* front arm — reaching for the living */}
               <g className="zombie-arm-front">
-                <path d="M84 62 C96 64 108 68 118 72 L116 80 C106 76 94 73 82 72 Z" />
-                {/* grasping hand */}
-                <path d="M116 70 l10 -3 -1 5 6 -2 -1 5 5 0 -3 5 -14 3 z" />
+                <path d="M96 76 C110 78 124 82 136 86 L134 96 C122 92 108 88 94 86 Z" />
+                {/* grasping hand with long fingers */}
+                <path d="M136 84 l12 -2 -1 6 8 -3 -1 6 7 0 -4 6 -16 4 z" fill="#0a0614" />
               </g>
             </g>
           </svg>
