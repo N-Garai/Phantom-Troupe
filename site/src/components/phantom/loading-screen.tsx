@@ -234,7 +234,7 @@ const CLODS = [
   { left: "50%", dx: "-6px", dy: "-74px", s: 0.7, delay: 0.12 },
 ];
 
-export function LoadingScreen() {
+export function LoadingScreen({ onComplete }: { onComplete?: () => void } = {}) {
   const [visible, setVisible] = useState(false);
   const [phase, setPhase] = useState<Phase>("forest");
   const [reduce, setReduce] = useState(false);
@@ -290,6 +290,8 @@ export function LoadingScreen() {
       document.body.style.overflow = "";
       audio.stop();
       setVisible(false);
+      // let the exit animation play before the page reveals
+      timers.current.push(setTimeout(() => onComplete?.(), reduce ? 350 : 800));
     });
 
     return () => {
@@ -311,6 +313,8 @@ export function LoadingScreen() {
       document.body.style.overflow = "";
       audioRef.current?.stop();
       setPhase("exit");
+      // fire completion after the exit animation finishes
+      timers.current.push(setTimeout(() => onComplete?.(), reduce ? 300 : 750));
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" || e.key === "Enter" || e.key === " ") skip();
