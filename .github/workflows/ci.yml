@@ -1,0 +1,125 @@
+name: hauntings
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cli:
+    name: phantom-cli — ${{ matrix.os }} / ${{ matrix.shell }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            shell: bash
+          - os: macos-latest
+            shell: zsh
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell == 'zsh' && 'zsh {0}' || 'bash {0}' }}
+        working-directory: phantom-cli
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
+      - name: Zero-dependency oath — the CLI must run bare
+        run: |
+          mv node_modules phantom-nm-tmp
+          node dist/index.js --version
+          node dist/index.js status
+          mv phantom-nm-tmp node_modules
+      - name: Smoke — help & version
+        run: |
+          node dist/index.js --version
+          node dist/index.js help
+      - name: Smoke — capture files a corpse
+        run: |
+          node dist/index.js _capture 1 "definitely-not-a-real-command --flag" || true
+          test -f ~/.phantom/morgue.jsonl && echo "corpse filed ✓"
+          grep -q "definitely-not-a-real-command" ~/.phantom/morgue.jsonl
+      - name: Smoke — hook install is idempotent
+        run: |
+          node dist/index.js init --yes
+          node dist/index.js init --yes
+          count=$(grep -c ">>> phantom-troupe >>>" ~/.zshrc ~/.bashrc 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
+          [ "$count" -le 1 ] && echo "hooks idempotent ✓"
+      - name: Smoke — daemon round trip
+        run: |
+          node dist/index.js --daemon &
+          sleep 2
+          curl -sf http://127.0.0.1:7313/api/health
+          curl -sf -X POST http://127.0.0.1:7313/api/exec -H 'content-type: application/json' -d '{"cmd":"echo hello-phantom"}' | grep -q "hello-phantom"
+          node dist/index.js stop
+
+  cli-windows:
+    name: phantom-cli — windows-latest / powershell
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: phantom-cli
+    env:
+      PHANTOM_HOME: ${{ runner.temp }}\phantom-home
+      USERPROFILE: ${{ runner.temp }}\fake-home
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Typecheck + Build
+        run: |
+          npm run typecheck
+          npm run build
+      - name: Smoke — PowerShell profile hooks are installed once
+        run: |
+          node dist/index.js init
+          node dist/index.js init
+          $hits = (Get-ChildItem -Recurse "$env:USERPROFILE\Documents" -Filter profile.ps1 | ForEach-Object { (Select-String -Path $_.FullName -Pattern ">>> phantom-troupe >>>").Count } | Measure-Object -Sum).Sum
+          if ($hits -ne 1) { throw "hooks not idempotent ($hits blocks)" }
+          "hooks idempotent ✓"
+      - name: Smoke — capture files a corpse
+        run: |
+          node dist/index.js _capture 1 "definitely-not-a-real-command --flag"
+          if (-not (Test-Path "$env:PHANTOM_HOME\morgue.jsonl")) { throw "corpse not filed" }
+          Select-String -Path "$env:PHANTOM_HOME\morgue.jsonl" -Pattern "definitely-not-a-real-command" | Out-Null
+          "corpse filed ✓"
+      - name: Smoke — daemon round trip (PowerShell inside the séance)
+        run: |
+          Start-Process -FilePath node -ArgumentList 'dist/index.js','--daemon' -WindowStyle Hidden
+          Start-Sleep 2
+          $health = (Invoke-WebRequest -UseBasicParsing http://127.0.0.1:7313/api/health).Content
+          if ($health -notmatch 'ok') { throw "daemon did not wake" }
+          $exec = (Invoke-WebRequest -UseBasicParsing -Method Post -Body '{"cmd":"Get-Command node | Select-Object -ExpandProperty Name"}' -ContentType 'application/json' http://127.0.0.1:7313/api/exec).Content
+          if ($exec -notmatch 'node') { throw "powershell exec failed: $exec" }
+          node dist/index.js stop
+          "daemon round trip ✓"
+
+  site:
+    name: landing — the graveyard gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install
+        run: bun install --frozen-lockfile
+      - name: Typecheck
+        run: bunx tsc --noEmit
+      - name: Lint
+        run: bun run lint
+      - name: Build
+        run: bun run build

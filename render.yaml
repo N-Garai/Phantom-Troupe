@@ -1,0 +1,28 @@
+# Render blueprint — the hosted graveyard gate (landing site).
+# Deploy: Render dashboard → New → Blueprint → point at this repo.
+# Fully static: Next.js exports plain files to site/out, Render's static
+# runtime serves them from a global CDN. Cheap (free tier), fast, and
+# nothing to keep alive. The local séance UI (phantom web) is NOT hosted
+# here — it only ever runs on the user's own machine at 127.0.0.1:7313.
+services:
+  - type: web
+    name: phantom-troupe
+    runtime: static
+    plan: free
+    region: oregon
+    buildCommand: cd site && npm install && npm run build
+    staticPublishPath: ./site/out
+    headers:
+      # never let the browser cache index.html too long; hashed assets are fine
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+      - path: /_next/static/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"

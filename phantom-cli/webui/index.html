@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phantom Troupe — local séance</title>
+<style>
+  :root{
+    --void:#050309;--tomb:#0d0914;--crypt:#161022;--bone:#e9e1d2;--ash:#97907f;
+    --marigold:#f79b2e;--blood:#c22836;--spectre:#74f2a4;--candle:#ffd27a;
+    --border:rgba(233,225,210,.12);--mono:ui-monospace,'JetBrains Mono','Cascadia Code',Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:radial-gradient(ellipse 90% 60% at 50% -10%,rgba(109,75,180,.14),transparent 60%),var(--void);
+    color:var(--bone);font-family:var(--mono);font-size:13px;display:flex;flex-direction:column;min-height:100vh;
+  }
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:rgba(13,9,20,.9)}
+  .brand{display:flex;align-items:center;gap:10px;letter-spacing:.2em;font-weight:700}
+  .brand b{color:var(--marigold)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--spectre);box-shadow:0 0 10px var(--spectre)}
+  .dot.dead{background:var(--blood);box-shadow:0 0 10px var(--blood)}
+  nav{display:flex;gap:6px;flex-wrap:wrap}
+  nav button{background:transparent;border:1px solid var(--border);color:var(--ash);padding:8px 14px;border-radius:8px;cursor:pointer;font-family:var(--mono);text-transform:uppercase;letter-spacing:.12em;font-size:11px}
+  nav button.active{background:var(--marigold);color:var(--void);border-color:var(--marigold);font-weight:700}
+  main{flex:1;display:none;padding:18px;max-width:1100px;width:100%;margin:0 auto}
+  main.active{display:block}
+  .panel{background:rgba(13,9,20,.85);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .term{height:56vh;overflow-y:auto;padding:16px;line-height:1.65}
+  .term::-webkit-scrollbar{width:8px}.term::-webkit-scrollbar-thumb{background:rgba(247,155,46,.3);border-radius:8px}
+  .l-in{color:var(--bone)}.l-in .p{color:var(--marigold)}
+  .l-out{color:var(--ash);white-space:pre-wrap;word-break:break-word}
+  .l-err{color:#e0717c;white-space:pre-wrap}
+  .l-agent{color:var(--spectre);white-space:pre-wrap}
+  .l-sys{color:#a08cd8;white-space:pre-wrap}
+  form.exec{display:flex;gap:10px;align-items:center;border-top:1px solid var(--border);padding:12px 16px}
+  .p{color:var(--marigold)}
+  input#cmd{flex:1;background:transparent;border:0;outline:0;color:var(--bone);font-family:var(--mono);font-size:13px}
+  input#cmd::placeholder{color:rgba(151,144,127,.5)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btn{border:1px solid var(--border);background:transparent;color:var(--bone);padding:10px 16px;border-radius:8px;cursor:pointer;font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;font-size:11px}
+  .btn.gold{border-color:rgba(247,155,46,.5);background:rgba(247,155,46,.12);color:var(--marigold)}
+  .btn.gold:hover{background:var(--marigold);color:var(--void)}
+  .btn.spectre{border-color:rgba(116,242,164,.4);background:rgba(116,242,164,.1);color:var(--spectre)}
+  .btn.spectre:hover{background:var(--spectre);color:var(--void)}
+  .btn.blood{border-color:rgba(194,40,54,.5);background:rgba(194,40,54,.1);color:#e0717c}
+  .btn.blood:hover{background:var(--blood);color:var(--bone)}
+  .cards{display:flex;gap:6px;height:92px;align-items:center;justify-content:center;margin:14px 0}
+  .card{width:56px;height:80px;border-radius:6px;background:#efe6d4;border:1px solid rgba(0,0,0,.4);display:flex;flex-direction:column;justify-content:space-between;padding:5px;color:#1a1a1a;font-weight:700;transition:transform .35s cubic-bezier(.2,.8,.3,1),opacity .35s;opacity:.25;transform:translateY(14px)}
+  .card.up{opacity:1;transform:translateY(-6px) rotate(var(--r))}
+  .card.hole{color:var(--blood);border-color:var(--blood)}
+  .explain{border:1px solid var(--border);border-radius:10px;background:rgba(5,3,9,.8);padding:14px;display:none;line-height:1.7;white-space:pre-wrap}
+  .explain.show{display:block}
+  .explain .tag{color:var(--spectre)}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--ash)}
+  th{color:var(--marigold);text-transform:uppercase;letter-spacing:.12em;font-size:10px}
+  .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;border:1px solid}
+  .badge.resurrect{color:var(--spectre);border-color:rgba(116,242,164,.5)}
+  .badge.retire{color:var(--candle);border-color:rgba(255,210,122,.5)}
+  .badge.requiem{color:#e0717c;border-color:rgba(194,40,54,.5)}
+  label.field{display:flex;justify-content:space-between;align-items:center;margin:14px 0 6px;color:var(--ash)}
+  input[type=range]{width:100%;accent-color:var(--marigold)}
+  select,input[type=text]{background:var(--void);color:var(--bone);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:var(--mono);width:100%}
+  /* the ascension */
+  #ascend{position:fixed;inset:0;pointer-events:none;display:none;z-index:50}
+  #ascend.on{display:block}
+  #ascend .halo{position:absolute;bottom:0;left:0;right:0;height:40%;background:radial-gradient(circle at 22% 100%,rgba(116,242,164,.14),transparent 60%)}
+  #ascend .ghost{position:absolute;bottom:-40px;left:8%;width:72px;filter:drop-shadow(0 0 24px rgba(116,242,164,.5))}
+  #ascend.on .ghost{animation:ascend 5s cubic-bezier(.3,.1,.4,1) forwards}
+  #ascend .msg{position:absolute;bottom:18px;left:calc(8% + 90px);color:var(--spectre);text-shadow:0 0 18px rgba(116,242,164,.4);font-family:Georgia,serif;letter-spacing:.06em}
+  #ascend.on .msg{animation:ascend 5s cubic-bezier(.3,.1,.4,1) forwards}
+  @keyframes ascend{0%{opacity:0;transform:translateY(30px) scale(.7);filter:blur(6px)}12%{opacity:1;filter:blur(0)}70%{opacity:1;transform:translateY(-46vh) scale(1.05)}100%{opacity:0;transform:translateY(-70vh) scale(.5);filter:blur(10px)}}
+  .hint{color:rgba(151,144,127,.7);font-size:11px;margin-top:8px}
+  h2.sec{font-family:Georgia,serif;letter-spacing:.08em;font-size:18px;margin-bottom:12px;color:var(--bone)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg width="26" height="26" viewBox="0 0 64 64"><path d="M32 10c-9.4 0-16 7.2-16 16.4 0 6.2 2.4 9.6 4.6 12.6 1.5 2 2.9 3.9 3.4 6.6.3 1.6 1.6 2.4 3 2.4h10c1.4 0 2.7-.8 3-2.4.5-2.7 1.9-4.6 3.4-6.6 2.2-3 4.6-6.4 4.6-12.6C48 17.2 41.4 10 32 10z" fill="#e9e1d2"/><circle cx="25.5" cy="27" r="2.6" fill="#050309"/><circle cx="38.5" cy="27" r="2.6" fill="#050309"/></svg>
+    PHANTOM<b>·</b>TROUPE <span id="dot" class="dot" title="daemon"></span>
+  </div>
+  <nav>
+    <button data-tab="seance" class="active">Séance</button>
+    <button data-tab="graveyard">Graveyard</button>
+    <button data-tab="morgue">Morgue</button>
+    <button data-tab="memory">Memory</button>
+  </nav>
+</header>
+
+<main id="tab-seance" class="active">
+  <div class="panel">
+    <div class="term" id="term"></div>
+    <form class="exec" id="execForm">
+      <span class="p">ghost@machine:~$</span>
+      <input id="cmd" autocomplete="off" spellcheck="false" placeholder="run a real command — the troupe is watching" />
+      <button class="btn gold" type="submit">execute</button>
+    </form>
+  </div>
+  <div class="row">
+    <button class="btn gold" id="dealBtn">☠ deal the dead man's hand</button>
+    <button class="btn spectre" id="seanceBtn">🕯 run the séance sweep</button>
+  </div>
+  <div class="cards" id="cards"></div>
+  <div class="explain" id="explain"></div>
+  <p class="hint">The terminal above executes real commands on this machine, via the helper bound to 127.0.0.1 only. Failed commands are autopsied and filed.</p>
+</main>
+
+<main id="tab-graveyard">
+  <h2 class="sec">The graveyard — dead scripts, aliases & crons</h2>
+  <div class="row" style="margin-bottom:12px">
+    <button class="btn gold" id="seanceBtn2">🕯 run the séance sweep</button>
+  </div>
+  <div class="panel" style="padding:6px"><table id="graveTable"><thead><tr><th>ghost</th><th>kind</th><th>dead for</th><th>obituary</th><th>verdict</th></tr></thead><tbody></tbody></table></div>
+</main>
+
+<main id="tab-morgue">
+  <h2 class="sec">The morgue — failed commands, with causes of death</h2>
+  <div class="panel" style="padding:6px"><table id="morgueTable"><thead><tr><th>when</th><th>command</th><th>exit</th><th>coroner's report</th></tr></thead><tbody></tbody></table></div>
+</main>
+
+<main id="tab-memory">
+  <h2 class="sec">Memory & the idle reaper</h2>
+  <div class="panel" style="padding:18px;max-width:560px">
+    <label class="field"><span>unload the brain after idle</span><b id="ttlVal" style="color:var(--spectre)">10 min</b></label>
+    <input type="range" id="ttl" min="1" max="60" value="10" />
+    <label class="field"><span>brain</span></label>
+    <select id="provider">
+      <option value="ollama">local open-weight model (ollama)</option>
+      <option value="gemma-api">gemma api (key from environment)</option>
+    </select>
+    <label class="field"><span>model</span></label>
+    <input type="text" id="model" placeholder="gemma3:4b" />
+    <div class="row">
+      <button class="btn gold" id="saveCfg">save</button>
+      <button class="btn spectre" id="flushBtn">🪦 release the spirits now</button>
+    </div>
+    <p class="hint">When the brain sits silent past your threshold, the reaper unloads it and returns the RAM — you'll see a spirit ascend from the side of the terminal. Everything is stored in ~/.phantom as plain files.</p>
+  </div>
+</main>
+
+<div id="ascend"><div class="halo"></div>
+  <svg class="ghost" viewBox="0 0 200 240"><path d="M100 18c-44 0-72 33-72 76 0 29 10 45 20 59 7 10 13 19 15 32 1 7 7 11 14 11h46c7 0 13-4 14-11 2-13 8-22 15-32 10-14 20-30 20-59 0-43-28-76-72-76z" fill="rgba(233,225,210,.85)"/><ellipse cx="74" cy="96" rx="9" ry="14" fill="#050309"/><ellipse cx="126" cy="96" rx="9" ry="14" fill="#050309"/></svg>
+  <div class="msg" id="ascendMsg">gone to the light…</div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),term=$('#term');let hist=[],hi=-1,cardTimer=[];
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function line(cls,html){const p=document.createElement('p');p.className='l-'+cls;p.innerHTML=html;term.appendChild(p);term.scrollTop=term.scrollHeight;while(term.children.length>400)term.firstChild.remove()}
+function sys(t){line('sys',esc(t))}
+function out(t){line('out',esc(t))}
+function agent(t){line('agent',esc(t))}
+function err(t){line('err',esc(t))}
+
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));
+  document.querySelectorAll('main').forEach(m=>m.classList.toggle('active',m.id==='tab-'+b.dataset.tab));
+});
+
+async function jfetch(u,o){const r=await fetch(u,o);return r.json()}
+
+// state
+(async()=>{try{
+  const s=await jfetch('/api/state');
+  $('#dot').classList.toggle('dead',false);
+  sys('the troupe is awake · '+Math.round(s.uptimeSec)+'s up · brain: '+s.provider+' · '+s.model+' · idle unload '+s.idleUnloadMinutes+' min');
+  sys('corpses filed: '+s.corpses+' · graves tended: '+s.graves);
+  $('#ttl').value=s.idleUnloadMinutes;$('#ttlVal').textContent=s.idleUnloadMinutes+' min';
+  $('#provider').value=s.provider;$('#model').value=s.model;
+}catch(e){$('#dot').classList.add('dead');sys('helper unreachable — capture continues, brains wait')}})();
+
+// exec
+$('#execForm').onsubmit=async e=>{
+  e.preventDefault();const cmd=$('#cmd').value.trim();if(!cmd)return;
+  hist.push(cmd);hi=hist.length;
+  line('in','<span class="p">ghost@machine:~$</span> '+esc(cmd));$('#cmd').value='';
+  out('…');
+  const t0=Date.now();
+  try{
+    const r=await jfetch('/api/exec',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({cmd})});
+    term.lastChild.remove();
+    if(r.stdout)out(r.stdout.replace(/\n$/,''));
+    if(r.stderr)err(r.stderr.replace(/\n$/,''));
+    if(r.guard){line('err','['+r.guard.severity.toUpperCase()+'] '+r.guard.pattern+' — '+esc(r.guard.reason))}
+    out('· exit '+r.exit+' in '+r.ms+' ms');
+  }catch(e){term.lastChild.remove();err('the helper did not answer — is it awake? (phantom start)')}
+};
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowUp'&&document.activeElement===$('#cmd')&&hi>0){hi--;$('#cmd').value=hist[hi]}
+  if(e.key==='ArrowDown'&&document.activeElement===$('#cmd')){hi=Math.min(hist.length,hi+1);$('#cmd').value=hist[hi]??''}
+});
+
+// dead man's hand
+const SUITS=['♠','♣','♠','♣','?'];
+$('#dealBtn').onclick=async()=>{
+  cardTimer.forEach(clearTimeout);const box=$('#cards');box.innerHTML='';$('#explain').classList.remove('show');
+  SUITS.forEach((s,i)=>{const d=document.createElement('div');d.className='card'+(i===4?' hole':'');d.style.setProperty('--r',((i-2)*8)+'deg');
+    d.innerHTML='<span>'+(i<4?'A':'?')+'</span><span style="align-self:center;font-size:18px">'+s+'</span><span style="transform:rotate(180deg);align-self:end">'+(i<4?'A':'?')+'</span>';
+    box.appendChild(d);cardTimer.push(setTimeout(()=>d.classList.add('up'),80+i*130))});
+  const cmd=$('#cmd').value.trim()||document.querySelector('#morgueTable tbody tr td:nth-child(2)')?.textContent||'tar';
+  const v=await jfetch('/api/explain',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({cmd})});
+  const ex=$('#explain');ex.textContent='';
+  const b=document.createElement('b');b.style.color='var(--marigold)';b.textContent=cmd;ex.appendChild(b);
+  const pre=document.createElement('div');pre.textContent=v.text;ex.appendChild(pre);ex.classList.add('show');
+};
+
+// seance
+async function doSeance(){agent('the Medium walks the graveyard…');
+  const r=await jfetch('/api/seance',{method:'POST'});
+  agent(' '+r.added+' new grave(s) · '+r.graves.length+' tended in total');loadGraves()}
+$('#seanceBtn').onclick=doSeance;$('#seanceBtn2').onclick=doSeance;
+
+// tables
+async function loadGraves(){const r=await jfetch('/api/graves');const tb=document.querySelector('#graveTable tbody');tb.innerHTML='';
+  r.graves.forEach(g=>{const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+esc(g.name)+'</td><td>'+esc(g.kind)+'</td><td>'+(g.daysDead?g.daysDead+'d':'—')+'</td><td>'+esc((g.summary||'').slice(0,90))+'</td><td><span class="badge '+(g.verdict||'retire')+'">'+esc(g.verdict||'pending')+'</span></td>';tb.appendChild(tr)})}
+async function loadMorgue(){const r=await jfetch('/api/morgue?limit=40');const tb=document.querySelector('#morgueTable tbody');tb.innerHTML='';
+  r.corpses.forEach(c=>{const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+esc((c.ts||'').slice(0,16).replace('T',' '))+'</td><td style="color:var(--bone)">'+esc(c.cmd)+'</td><td>'+c.exit+'</td><td>'+esc((c.dx||'—').slice(0,140))+'</td>';tb.appendChild(tr)})}
+const tabObs=new MutationObserver(()=>{if($('#tab-graveyard').classList.contains('active'))loadGraves();if($('#tab-morgue').classList.contains('active'))loadMorgue()});
+tabObs.observe($('#tab-graveyard'),{attributes:true,attributeFilter:['class']});tabObs.observe($('#tab-morgue'),{attributes:true,attributeFilter:['class']});
+
+// memory
+$('#ttl').oninput=e=>$('#ttlVal').textContent=e.target.value+' min';
+$('#saveCfg').onclick=async()=>{const c=await jfetch('/api/config',{method:'POST',headers:{'content-type':'application/json'},
+  body:JSON.stringify({idleUnloadMinutes:+$('#ttl').value,provider:$('#provider').value,model:$('#model').value})});
+  sys('config saved — provider '+c.provider+' · '+c.model+' · idle unload '+c.idleUnloadMinutes+' min')};
+$('#flushBtn').onclick=async()=>{await jfetch('/api/memory/flush',{method:'POST'})};
+
+// SSE: verdicts & the ascension
+const es=new EventSource('/api/events');
+es.addEventListener('verdict',e=>{const v=JSON.parse(e.data);agent('['+v.agent.toUpperCase()+'] '+v.text)});
+es.addEventListener('ascension',e=>{const d=JSON.parse(e.data);
+  $('#ascendMsg').textContent=d.message||'gone to the light…';const a=$('#ascend');a.classList.remove('on');void a.offsetWidth;a.classList.add('on');
+  agent('🪦 '+d.message);setTimeout(()=>a.classList.remove('on'),5400)});
+es.addEventListener('seance',e=>{const d=JSON.parse(e.data);agent('séance: '+d.added+' new grave(s)')});
+</script>
+</body>
+</html>

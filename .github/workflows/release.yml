@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    working-directory: phantom-cli
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Source tarball (compiled CLI included — runs bare)
+        run: cd .. && zip -r phantom-troupe-${{ github.ref_name }}.zip phantom-cli INSTALL.md README.md -x "phantom-cli/node_modules/*"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: ../phantom-troupe-${{ github.ref_name }}.zip

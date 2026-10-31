@@ -1,0 +1,1507 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-cinzel);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Phantom palette */
+  --color-void: #050309;
+  --color-tomb: #0d0914;
+  --color-crypt: #161022;
+  --color-bone: #e9e1d2;
+  --color-ash: #97907f;
+  --color-marigold: #f79b2e;
+  --color-ember: #ff6d1f;
+  --color-blood: #c22836;
+  --color-spectre: #74f2a4;
+  --color-candle: #ffd27a;
+  --color-violetsmoke: #6d4bb4;
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: #050309;
+  --foreground: #e9e1d2;
+  --card: #0d0914;
+  --card-foreground: #e9e1d2;
+  --popover: #0d0914;
+  --popover-foreground: #e9e1d2;
+  --primary: #f79b2e;
+  --primary-foreground: #050309;
+  --secondary: #161022;
+  --secondary-foreground: #e9e1d2;
+  --muted: #161022;
+  --muted-foreground: #97907f;
+  --accent: #6d4bb4;
+  --accent-foreground: #e9e1d2;
+  --destructive: #c22836;
+  --destructive-foreground: #e9e1d2;
+  --border: rgba(233, 225, 210, 0.12);
+  --input: rgba(233, 225, 210, 0.16);
+  --ring: #f79b2e;
+  --chart-1: #f79b2e;
+  --chart-2: #74f2a4;
+  --chart-3: #6d4bb4;
+  --chart-4: #c22836;
+  --chart-5: #ffd27a;
+  --sidebar: #0d0914;
+  --sidebar-foreground: #e9e1d2;
+  --sidebar-primary: #f79b2e;
+  --sidebar-primary-foreground: #050309;
+  --sidebar-accent: #161022;
+  --sidebar-accent-foreground: #e9e1d2;
+  --sidebar-border: rgba(233, 225, 210, 0.12);
+  --sidebar-ring: #f79b2e;
+}
+
+.dark {
+  --background: #050309;
+  --foreground: #e9e1d2;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(109, 75, 180, 0.14), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 85% 20%, rgba(255, 109, 31, 0.05), transparent 60%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: rgba(247, 155, 46, 0.35);
+    color: #fff8ec;
+  }
+}
+
+/* ---------- Phantom atmosphere ---------- */
+
+.noise::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.fog-layer {
+  position: absolute;
+  inset: -20% -10%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 45% 30% at 20% 80%, rgba(157, 140, 200, 0.10), transparent 70%),
+    radial-gradient(ellipse 40% 26% at 75% 70%, rgba(247, 155, 46, 0.07), transparent 70%);
+  filter: blur(2px);
+  animation: fog-drift 26s ease-in-out infinite alternate;
+}
+.fog-layer.fog-2 {
+  animation-duration: 38s;
+  animation-delay: -12s;
+  opacity: 0.7;
+  transform: scaleX(-1);
+}
+@keyframes fog-drift {
+  0% { transform: translate3d(-3%, 0, 0) scale(1); }
+  50% { transform: translate3d(3%, -2%, 0) scale(1.06); }
+  100% { transform: translate3d(-2%, 2%, 0) scale(1.02); }
+}
+
+.text-glow-marigold {
+  text-shadow: 0 0 24px rgba(247, 155, 46, 0.45), 0 0 64px rgba(247, 155, 46, 0.18);
+}
+.text-glow-spectre {
+  text-shadow: 0 0 18px rgba(116, 242, 164, 0.4), 0 0 48px rgba(116, 242, 164, 0.15);
+}
+
+.candle-flicker {
+  animation: candle 3.4s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+@keyframes candle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  8% { opacity: 0.86; transform: scale(0.985) translateY(0.4px); }
+  12% { opacity: 1; }
+  42% { opacity: 0.92; transform: scale(1.01); }
+  46% { opacity: 1; }
+  74% { opacity: 0.88; transform: scale(0.99); }
+  78% { opacity: 1; }
+}
+
+.ghost-float {
+  animation: ghost-float 7s ease-in-out infinite;
+}
+@keyframes ghost-float {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50% { transform: translateY(-22px) rotate(1.5deg); }
+}
+
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee-x 32s linear infinite;
+}
+.marquee-reverse {
+  animation-direction: reverse;
+}
+
+.blink-caret {
+  animation: blink 1.06s steps(1) infinite;
+}
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.glitch-hover:hover .glitch-a,
+.glitch-hover:focus-visible .glitch-a {
+  animation: glitch-a 0.32s steps(2) infinite;
+  clip-path: inset(0 0 55% 0);
+}
+.glitch-hover:hover .glitch-b,
+.glitch-hover:focus-visible .glitch-b {
+  animation: glitch-b 0.27s steps(2) infinite reverse;
+  clip-path: inset(55% 0 0 0);
+}
+@keyframes glitch-a {
+  0% { transform: translate(-2px, -1px); }
+  50% { transform: translate(2px, 1px); }
+  100% { transform: translate(-1px, 0); }
+}
+@keyframes glitch-b {
+  0% { transform: translate(2px, 1px); }
+  50% { transform: translate(-2px, -1px); }
+  100% { transform: translate(1px, 0); }
+}
+
+/* ghost ascension — used by demo overlay */
+.ascension {
+  animation: ascend 5.2s cubic-bezier(0.3, 0.1, 0.4, 1) forwards;
+}
+@keyframes ascend {
+  0% { opacity: 0; transform: translateY(40px) scale(0.7); filter: blur(6px); }
+  12% { opacity: 1; filter: blur(0px); }
+  70% { opacity: 1; transform: translateY(-46vh) scale(1.05); filter: blur(0px); }
+  100% { opacity: 0; transform: translateY(-70vh) scale(0.5); filter: blur(10px); }
+}
+
+.pulse-ring {
+  animation: pulse-ring 2.6s ease-out infinite;
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(247, 155, 46, 0.35); }
+  70% { box-shadow: 0 0 0 14px rgba(247, 155, 46, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(247, 155, 46, 0); }
+}
+
+.vignette {
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+.grave-card {
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.2, 0.6, 0.25, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+  will-change: transform;
+}
+
+.term-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.term-scroll::-webkit-scrollbar-track { background: rgba(233, 225, 210, 0.04); }
+.term-scroll::-webkit-scrollbar-thumb { background: rgba(247, 155, 46, 0.25); border-radius: 8px; }
+.term-scroll::-webkit-scrollbar-thumb:hover { background: rgba(247, 155, 46, 0.45); }
+
+.hairline-t { border-top: 1px solid rgba(233, 225, 210, 0.08); }
+
+/* ============================== 3D graveyard world ============================== */
+
+.gy-perspective {
+  position: absolute;
+  inset: 0;
+  perspective: 1100px;
+  perspective-origin: 50% 78%;
+  pointer-events: none;
+}
+.gy-world {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.gy-layer {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.gy-layer-back {
+  transform: translate3d(calc(var(--mx, 0) * -7px), calc(var(--my, 0) * -4px + var(--sy, 0) * -0.03px), -120px) scale(1.13);
+}
+.gy-layer-mid {
+  transform: translate3d(calc(var(--mx, 0) * -16px), calc(var(--my, 0) * -7px), -24px);
+}
+.gy-layer-front {
+  transform: translate3d(calc(var(--mx, 0) * -30px), calc(var(--my, 0) * -11px), 34px) scale(1.05);
+}
+
+/* extruded tombstone cuboid — front face, right side, top */
+.gy-stone {
+  position: absolute;
+  transform-style: preserve-3d;
+  transform: rotateY(calc(var(--mx, 0) * -7deg)) rotateZ(var(--tilt, 0deg));
+  will-change: transform;
+}
+.gy-face {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(calc(var(--d) / 2));
+  background: linear-gradient(180deg, #1c1533 0%, #130d22 52%, #0a0614 100%);
+  box-shadow:
+    inset 0 10px 24px rgba(0, 0, 0, 0.65),
+    inset 0 -3px 10px rgba(116, 242, 164, 0.05),
+    0 0 26px rgba(8, 5, 16, 0.9);
+  overflow: hidden;
+}
+.gy-face-rounded { border-radius: 46% 46% 5% 5% / 30% 30% 3% 3%; }
+.gy-face-slab { border-radius: 8% 8% 4% 4% / 6% 6% 3% 3%; }
+.gy-face-broken { border-radius: 44% 12% 5% 5% / 26% 8% 3% 3%; }
+.gy-side {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: var(--d);
+  left: 100%;
+  margin-left: calc(var(--d) / -2);
+  transform: rotateY(90deg);
+  background: linear-gradient(90deg, #0f0a1c 0%, #070410 100%);
+}
+.gy-top {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+  height: var(--d);
+  margin-bottom: calc(var(--d) / -2);
+  transform: rotateX(90deg);
+  background: linear-gradient(180deg, #2a1f4a 0%, #17102c 100%);
+}
+
+/* candles on the graves */
+.gy-candle {
+  position: absolute;
+  width: 8px;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(180deg, #e9e1d2 0%, #b8ab90 100%);
+}
+.gy-candle-glow {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 210, 122, 0.5) 0%, rgba(255, 109, 31, 0.22) 45%, transparent 70%);
+  animation: candle 2.7s ease-in-out infinite;
+}
+
+/* ============================== the dead man's hand ============================== */
+
+.hand {
+  position: absolute;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.hand-pit {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50% 50% 0 0 / 18% 18% 0 0;
+}
+.hand-riser {
+  position: absolute;
+  inset: 0;
+  transform: translateY(34%);
+  transition: transform 1.5s cubic-bezier(0.34, 1.3, 0.4, 1);
+}
+.hand-loop .hand-riser {
+  animation: hand-rise 12s ease-in-out infinite;
+  transition: none;
+}
+.hand:hover .hand-riser,
+.hand:focus-visible .hand-riser {
+  animation: none;
+  transform: translateY(12%);
+}
+.hand:focus-visible {
+  outline: none;
+}
+.hand:focus-visible .hand-bone {
+  filter: drop-shadow(0 0 10px rgba(116, 242, 164, 0.85));
+}
+@keyframes hand-rise {
+  0% { transform: translateY(106%); }
+  7% { transform: translateY(106%); }
+  17% { transform: translateY(16%); }
+  24% { transform: translateY(26%); }
+  48% { transform: translateY(23%); }
+  55% { transform: translateY(25%); }
+  63% { transform: translateY(21%); }
+  80% { transform: translateY(34%); }
+  93% { transform: translateY(107%); }
+  100% { transform: translateY(106%); }
+}
+/* fingers twitch while idle, spread when the hand is up */
+.hand-finger {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: finger-twitch 4.6s ease-in-out infinite;
+}
+.hand:hover .hand-finger,
+.hand:focus-visible .hand-finger {
+  animation: finger-spread 0.9s cubic-bezier(0.34, 1.56, 0.5, 1) forwards;
+}
+@keyframes finger-twitch {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(-2.5deg); }
+  55% { transform: rotate(1.8deg); }
+  72% { transform: rotate(-1.2deg); }
+}
+@keyframes finger-spread {
+  0% { transform: rotate(0deg); }
+  55% { transform: rotate(var(--spread, -7deg)); }
+  100% { transform: rotate(var(--spread, -7deg)); }
+}
+/* dirt clods kicked loose each time the hand claws upward */
+.hand-dirt {
+  position: absolute;
+  width: 5px;
+  height: 4px;
+  border-radius: 40% 60% 55% 45%;
+  background: #2a2036;
+  opacity: 0;
+  animation: dirt-fall 2.4s ease-out infinite;
+}
+@keyframes dirt-fall {
+  0%, 13% { opacity: 0; transform: translate3d(0, -6px, 0) rotate(0deg); }
+  16% { opacity: 1; }
+  38% { opacity: 0.9; transform: translate3d(var(--dx, 14px), 34px, 0) rotate(160deg); }
+  46%, 100% { opacity: 0; transform: translate3d(calc(var(--dx, 14px) * 1.4), 52px, 0) rotate(240deg); }
+}
+.hand-whisper {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(116, 242, 164, 0.85);
+  text-shadow: 0 0 14px rgba(116, 242, 164, 0.5);
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: none;
+}
+.hand:hover .hand-whisper,
+.hand:focus-visible .hand-whisper {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.hand-bone-glow {
+  animation: bone-pulse 3.8s ease-in-out infinite;
+}
+@keyframes bone-pulse {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(116, 242, 164, 0.25)); }
+  50% { filter: drop-shadow(0 0 16px rgba(116, 242, 164, 0.55)); }
+}
+
+/* ============================== the shambling dead ============================== */
+
+.zombie {
+  position: absolute;
+  pointer-events: none;
+}
+.zombie-cross {
+  animation: zombie-cross 76s linear infinite;
+  /* during the start delay, hold the 0% frame (off-screen) instead of parking */
+  animation-fill-mode: backwards;
+  will-change: transform;
+}
+@keyframes zombie-cross {
+  0% { transform: translate3d(-24vw, 0, 0); }
+  30% { transform: translate3d(34vw, 0, 0); }
+  36% { transform: translate3d(37vw, 0, 0); }
+  41% { transform: translate3d(37.4vw, 0, 0) rotate(0.6deg); }
+  42.5% { transform: translate3d(37.2vw, 0, 0) rotate(-0.5deg); }
+  44% { transform: translate3d(37.6vw, 0, 0) rotate(0.4deg); }
+  49% { transform: translate3d(38vw, 0, 0); }
+  100% { transform: translate3d(122vw, 0, 0); }
+}
+.zombie-bob {
+  animation: zombie-bob 1.12s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+@keyframes zombie-bob {
+  0%, 100% { transform: translateY(0) rotate(-1.6deg); }
+  50% { transform: translateY(-3px) rotate(1.8deg); }
+}
+.zombie-leg-a {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: leg-swing 1.12s ease-in-out infinite;
+}
+.zombie-leg-b {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: leg-swing 1.12s ease-in-out infinite;
+  animation-delay: -0.56s;
+}
+@keyframes leg-swing {
+  0%, 100% { transform: rotate(11deg); }
+  50% { transform: rotate(-13deg); }
+}
+.zombie-arm-front {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: arm-reach 1.7s ease-in-out infinite;
+}
+@keyframes arm-reach {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(4.5deg); }
+}
+.zombie-arm-back {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: arm-dangle 1.4s ease-in-out infinite;
+}
+@keyframes arm-dangle {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(6deg); }
+}
+.zombie-head {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: head-loll 2.6s ease-in-out infinite;
+}
+@keyframes head-loll {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(4.5deg); }
+}
+.zombie-eye {
+  animation: eye-flicker 2.2s ease-in-out infinite;
+}
+@keyframes eye-flicker {
+  0%, 100% { opacity: 1; }
+  42% { opacity: 0.55; }
+  47% { opacity: 0.95; }
+  74% { opacity: 0.4; }
+}
+.zombie-coat {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: coat-flap 0.9s ease-in-out infinite;
+}
+@keyframes coat-flap {
+  0%, 100% { transform: skewX(0deg) rotate(0deg); }
+  50% { transform: skewX(4deg) rotate(-2.4deg); }
+}
+
+/* ============================== bats over the moon ============================== */
+
+.bat-colony {
+  position: absolute;
+  pointer-events: none;
+}
+.bat-path {
+  position: absolute;
+  animation: bat-fly var(--dur, 17s) linear infinite;
+  animation-delay: var(--delay, 0s);
+  /* during the start delay, hold the 0% frame (invisible) */
+  animation-fill-mode: backwards;
+  will-change: transform;
+}
+@keyframes bat-fly {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  4% { opacity: 1; }
+  96% { opacity: 1; }
+  100% { transform: translate3d(-118vw, 0, 0); opacity: 0; }
+}
+.bat-wave {
+  animation: bat-wave var(--wave, 3.4s) ease-in-out infinite;
+}
+@keyframes bat-wave {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(var(--amp, -22px)); }
+}
+.bat-flap {
+  animation: bat-flap var(--flap, 0.44s) ease-in-out infinite;
+  transform-origin: center 32%;
+}
+@keyframes bat-flap {
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  50% { transform: scaleY(0.4) scaleX(1.06); }
+}
+
+/* ============================== roaming spirits (canvas helper styles) ============================== */
+
+.ghost-tilt {
+  animation: ghost-tilt 8.5s ease-in-out infinite alternate;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+@keyframes ghost-tilt {
+  0% { transform: rotateX(5deg) rotateY(-8deg) rotateZ(-2deg) translateZ(0); }
+  50% { transform: rotateX(-4deg) rotateY(7deg) rotateZ(1.5deg) translateZ(10px); }
+  100% { transform: rotateX(3deg) rotateY(-6deg) rotateZ(-1.5deg) translateZ(-6px); }
+}
+.ghost-glow-pulse {
+  animation: ghost-glow 5.5s ease-in-out infinite;
+}
+@keyframes ghost-glow {
+  0%, 100% { filter: drop-shadow(0 0 22px rgba(116, 242, 164, 0.22)); }
+  50% { filter: drop-shadow(0 0 40px rgba(116, 242, 164, 0.45)); }
+}
+
+/* ============================== the summoning (loading rite) ============================== */
+
+.loader-stage {
+  contain: strict;
+}
+
+/* the hand waits buried, then bursts through with overshoot */
+.loader-hand-wait {
+  transform: translateX(-50%) translateY(96%);
+  opacity: 0;
+}
+.loader-hand {
+  animation: loader-hand-burst 0.62s cubic-bezier(0.2, 1.35, 0.4, 1) forwards;
+  will-change: transform;
+}
+@keyframes loader-hand-burst {
+  0% { transform: translateX(-50%) translateY(98%) scale(0.92); opacity: 0; }
+  30% { opacity: 1; }
+  68% { transform: translateX(-50%) translateY(-16%) scale(1.05); }
+  84% { transform: translateX(-50%) translateY(3%) scale(0.99); }
+  100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
+}
+.loader-hand-glow {
+  filter: drop-shadow(0 0 14px rgba(116, 242, 164, 0.5));
+  animation: loader-glow-pulse 2.2s ease-in-out infinite;
+}
+@keyframes loader-glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(116, 242, 164, 0.35)); }
+  50% { filter: drop-shadow(0 0 22px rgba(116, 242, 164, 0.7)); }
+}
+
+/* 3D depth for the rising hand — rotates slightly as it claws out */
+.loader-hand.hand-3d {
+  transform-style: preserve-3d;
+}
+.loader-hand.hand-3d svg {
+  transform: rotateX(12deg) rotateZ(-3deg);
+  transform-origin: 50% 200px;
+}
+
+/* spirit ascent — when the name vanishes, it dissolves upward like a ghost */
+.spirit-ascend {
+  animation: spirit-ascend 3.2s cubic-bezier(0.3, 0.1, 0.4, 1) forwards;
+}
+@keyframes spirit-ascend {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0px); }
+  20% { opacity: 0.95; transform: translate3d(0, -4px, 20px) scale(1.02); filter: blur(2px); }
+  60% { opacity: 0.4; transform: translate3d(0, -60vh, 120px) scale(1.1); filter: blur(8px); }
+  100% { opacity: 0; transform: translate3d(0, -120vh, 240px) scale(0.4); filter: blur(24px); }
+}
+.loader-crack path {
+  stroke-dasharray: 240;
+  stroke-dashoffset: 240;
+  animation: crack-draw 0.5s ease-out forwards;
+  animation-delay: 0.08s;
+}
+.loader-crack-dark path { stroke: #2a2036; animation-delay: 0.16s; }
+@keyframes crack-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* the mound splits apart as the hand claws through */
+.loader-mound-l {
+  animation: mound-left 0.55s cubic-bezier(0.3, 1.2, 0.4, 1) forwards;
+}
+.loader-mound-r {
+  animation: mound-right 0.55s cubic-bezier(0.3, 1.2, 0.4, 1) forwards;
+}
+@keyframes mound-left {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  60% { transform: translate(-14px, -6px) rotate(-5deg); }
+  100% { transform: translate(-10px, -2px) rotate(-3.5deg); }
+}
+@keyframes mound-right {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  60% { transform: translate(14px, -5px) rotate(5deg); }
+  100% { transform: translate(10px, -1px) rotate(3deg); }
+}
+
+/* dirt clods: burst outward, arc, then fall with gravity */
+.loader-clod {
+  position: absolute;
+  bottom: 0;
+  border-radius: 42% 58% 55% 45%;
+  background: #241b33;
+  box-shadow: 0 0 4px rgba(116, 242, 164, 0.25);
+  opacity: 0;
+  animation: clod-burst 1.05s cubic-bezier(0.15, 0.6, 0.4, 1) forwards;
+}
+@keyframes clod-burst {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(0.6); }
+  8% { opacity: 1; transform: translate(calc(var(--dx) * 0.12), calc(var(--dy) * 0.1)) rotate(10deg) scale(1); }
+  55% { opacity: 1; transform: translate(calc(var(--dx) * 0.78), calc(var(--dy) * 0.62)) rotate(120deg); }
+  100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) * -0.06 + 120px)) rotate(230deg) scale(0.85); }
+}
+
+/* the whole scene jolts at the moment of breaking */
+.loader-shake {
+  animation: loader-shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+@keyframes loader-shake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  12% { transform: translate3d(-7px, 3px, 0) rotate(-0.4deg); }
+  24% { transform: translate3d(6px, -4px, 0) rotate(0.4deg); }
+  38% { transform: translate3d(-5px, 2px, 0) rotate(-0.3deg); }
+  52% { transform: translate3d(4px, -2px, 0) rotate(0.2deg); }
+  68% { transform: translate3d(-3px, 1px, 0); }
+  84% { transform: translate3d(2px, -1px, 0); }
+}
+
+/* spectre flash from the broken grave */
+.loader-flash {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  height: 150px;
+  width: 190px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: radial-gradient(ellipse at center, rgba(116, 242, 164, 0.5) 0%, rgba(116, 242, 164, 0.14) 45%, transparent 72%);
+  animation: loader-flash 0.75s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes loader-flash {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.4); }
+  22% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) scale(1.5); }
+}
+
+/* ===================== cinematic layer: grain · flicker · creature detail ===================== */
+
+/* film grain — an SVG turbulence tile, jumped frame-by-frame like celluloid */
+.film-grain {
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.36'/%3E%3C/svg%3E");
+  background-size: 280px 280px;
+  animation: grain-shift 0.9s steps(1) infinite;
+}
+.film-grain-soft { opacity: 0.22; }
+@keyframes grain-shift {
+  0% { background-position: 0 0; }
+  20% { background-position: -46px 34px; }
+  40% { background-position: 34px -52px; }
+  60% { background-position: -28px -22px; }
+  80% { background-position: 40px 26px; }
+  100% { background-position: 0 0; }
+}
+
+/* the title stutters like a worn projection reel */
+.loader-flicker {
+  animation: film-flicker 1.7s steps(1) infinite;
+  text-shadow: 0 0 26px rgba(233, 225, 210, 0.22);
+}
+@keyframes film-flicker {
+  0%, 100% { opacity: 1; }
+  7% { opacity: 0.84; }
+  9% { opacity: 1; }
+  31% { opacity: 0.92; }
+  33% { opacity: 1; }
+  52% { opacity: 0.76; }
+  55% { opacity: 1; }
+  69% { opacity: 0.94; }
+  72% { opacity: 1; }
+  87% { opacity: 0.88; }
+  89% { opacity: 1; }
+}
+
+/* the moon's halo breathes; a cloud wisp crosses it once in a long while */
+.moon-halo { animation: halo-flicker 7s ease-in-out infinite; }
+@keyframes halo-flicker {
+  0%, 100% { opacity: 1; }
+  44% { opacity: 0.82; }
+  47% { opacity: 1; }
+  76% { opacity: 0.9; }
+}
+.moon-wisp { animation: wisp-drift 26s linear infinite; }
+@keyframes wisp-drift {
+  0% { transform: translateX(-160%); }
+  100% { transform: translateX(340%); }
+}
+
+/* the patient spider rotates gently around the thread's anchor */
+.spider-sway { transform-origin: 50% 0; animation: spider-sway 6.5s ease-in-out infinite; }
+@keyframes spider-sway {
+  0%, 100% { transform: rotate(4deg); }
+  50% { transform: rotate(-4deg); }
+}
+
+/* the jack-o'-lantern's candle gutters softly */
+.pumpkin-glow { animation: pumpkin-pulse 2.7s ease-in-out infinite; }
+@keyframes pumpkin-pulse {
+  0%, 100% { opacity: 0.72; }
+  42% { opacity: 1; }
+  58% { opacity: 0.85; }
+}
+
+/* the score toggle on the loading rite */
+.loader-sound {
+  border: 1px solid rgba(151, 144, 127, 0.32);
+  border-radius: 4px;
+  padding: 6px 10px;
+  background: rgba(5, 3, 9, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fog-layer, .ghost-float, .animate-marquee, .candle-flicker, .pulse-ring, .ascension,
+  .hand-riser, .hand-finger, .hand-dirt, .hand-bone-glow, .gy-candle-glow,
+  .zombie-cross, .zombie-bob, .zombie-leg-a, .zombie-leg-b, .zombie-arm-front,
+  .zombie-arm-back, .zombie-head, .zombie-eye, .zombie-coat,
+  .bat-path, .bat-wave, .bat-flap, .ghost-tilt, .ghost-glow-pulse,
+  .loader-hand, .loader-crack path, .loader-mound-l, .loader-mound-r,
+  .loader-clod, .loader-shake, .loader-flash, .loader-hand-glow,
+  .film-grain, .loader-flicker, .moon-halo, .moon-wisp, .spider-sway, .pumpkin-glow {
+    animation: none !important;
+  }
+  .hand-dirt, .loader-clod { opacity: 0 !important; }
+  .loader-hand-wait { opacity: 0 !important; }
+  .loader-hand { transform: translateX(-50%) translateY(0); opacity: 1; }
+  html { scroll-behavior: auto; }
+}
+
+/* ============================================================================ *
+ * SECTION SCENES — the animated worlds behind every section below the hero.
+ * ============================================================================ */
+
+.floating-content {
+  animation: content-float 7s ease-in-out infinite;
+}
+@keyframes content-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -8px, 10px); }
+}
+
+/* deeper 3D graveyard layers */
+.gy-layer-back {
+  transform: translate3d(calc(var(--mx, 0) * -7px), calc(var(--my, 0) * -4px + var(--sy, 0) * -0.03px), -160px) scale(1.18);
+}
+.gy-layer-mid {
+  transform: translate3d(calc(var(--mx, 0) * -16px), calc(var(--my, 0) * -7px), -32px);
+}
+.gy-layer-front {
+  transform: translate3d(calc(var(--mx, 0) * -30px), calc(var(--my, 0) * -11px), 48px) scale(1.1);
+}
+
+/* more pronounced tombstone extrusion */
+.gy-stone {
+  transform: rotateY(calc(var(--mx, 0) * -10deg)) rotateZ(var(--tilt, 0deg)) rotateX(2deg);
+}
+
+.scene-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* the vertical blend that seats each diorama between its neighbours */
+.scene-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    #050309 0%,
+    transparent 9%,
+    transparent 90%,
+    #050309 100%
+  );
+}
+/* whole-stage circuit breaker: nothing animates while off-screen */
+[data-on="0"] .scene-stage,
+[data-on="0"] .scene-stage * {
+  animation-play-state: paused !important;
+}
+
+/* ------------------------------- scene moods ------------------------------ */
+
+.sc-troupe {
+  background:
+    radial-gradient(58% 46% at 50% 102%, rgba(109, 75, 180, 0.17), transparent 70%),
+    linear-gradient(180deg, rgba(20, 12, 38, 0.35) 0%, transparent 34%, rgba(5, 3, 9, 0.4) 100%);
+}
+.sc-seance {
+  background:
+    radial-gradient(42% 44% at 80% 58%, rgba(255, 150, 60, 0.09), transparent 72%),
+    linear-gradient(180deg, rgba(16, 10, 34, 0.4) 0%, transparent 40%);
+}
+.sc-download {
+  background:
+    radial-gradient(34% 34% at 79% 14%, rgba(245, 238, 218, 0.09), transparent 70%),
+    linear-gradient(180deg, rgba(24, 22, 56, 0.42) 0%, transparent 46%);
+}
+.sc-architecture {
+  background:
+    radial-gradient(52% 42% at 50% 74%, rgba(116, 242, 164, 0.06), transparent 72%),
+    linear-gradient(180deg, rgba(14, 20, 30, 0.36) 0%, transparent 42%);
+}
+.sc-grimoire {
+  background:
+    radial-gradient(40% 40% at 16% 78%, rgba(255, 179, 71, 0.07), transparent 70%),
+    radial-gradient(36% 36% at 86% 70%, rgba(178, 158, 226, 0.08), transparent 70%);
+}
+.sc-research {
+  background:
+    radial-gradient(30% 40% at 15% 62%, rgba(255, 210, 122, 0.10), transparent 70%),
+    linear-gradient(180deg, rgba(10, 12, 26, 0.4) 0%, transparent 44%);
+}
+.sc-faq {
+  background:
+    linear-gradient(180deg, rgba(38, 56, 105, 0.16) 0%, transparent 52%),
+    radial-gradient(60% 40% at 50% 100%, rgba(20, 30, 60, 0.5), transparent 75%);
+}
+
+/* ============================ 1 · TROUPE — eruption ========================= */
+
+/* violet breath on the floor beneath the whole diorama */
+.ss-ground-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -4%;
+  width: min(860px, 96vw);
+  height: 34%;
+  transform: translateX(-50%);
+  background: radial-gradient(50% 60% at 50% 60%, rgba(109, 75, 180, 0.26), transparent 72%);
+  animation: ss-breathe 6.5s ease-in-out infinite;
+}
+@keyframes ss-breathe {
+  0%, 100% { opacity: 0.75; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+}
+
+/* the receding ground — a plane tilted into the third dimension */
+.ss-ground {
+  position: absolute;
+  left: -24%;
+  right: -24%;
+  bottom: -6%;
+  height: 52%;
+  transform: perspective(720px) rotateX(64deg);
+  transform-origin: 50% 100%;
+  background:
+    radial-gradient(60% 70% at 50% 30%, rgba(46, 32, 76, 0.55), transparent 75%),
+    linear-gradient(180deg, #0d0819 0%, #120c1f 45%, #0a0614 100%);
+}
+/* fence-lines of the plot marching toward the viewer */
+.ss-ground-rows {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(151, 144, 127, 0.09) 0 2px,
+    transparent 2px 44px
+  );
+  animation: ss-rows-recede 9s linear infinite;
+}
+@keyframes ss-rows-recede {
+  from { background-position-y: 0; }
+  to { background-position-y: 44px; }
+}
+
+/* the eruption stage — everything in this box bursts from one grave */
+.ss-erupt-stage {
+  position: absolute;
+  left: 50%;
+  bottom: 4%;
+  width: min(620px, 92vw);
+  height: 44%;
+  transform: translateX(-50%);
+  overflow: hidden;
+}
+/* the grave's breath — a violet burst that backlights the corpse at rise */
+.ss-burst-glow {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 330px;
+  height: 160px;
+  transform: translateX(-50%) scale(0.5);
+  background: radial-gradient(
+    50% 55% at 50% 72%,
+    rgba(178, 158, 226, 0.5),
+    rgba(109, 75, 180, 0.22) 45%,
+    transparent 72%
+  );
+  opacity: 0;
+  z-index: 2;
+  animation: ss-burst-glow 9s ease-out infinite;
+}
+@keyframes ss-burst-glow {
+  0%, 24% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+  30% { opacity: 0.95; transform: translateX(-50%) scale(1); }
+  40% { opacity: 0.5; transform: translateX(-50%) scale(1.1); }
+  68% { opacity: 0.4; transform: translateX(-50%) scale(1.12); }
+  80%, 100% { opacity: 0; transform: translateX(-50%) scale(0.6); }
+}
+/* the open grave — an ellipse receding into the earth */
+.ss-pit {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 66%;
+  height: 13%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(50% 60% at 50% 42%, #03020a 0%, #0b0716 68%, #171030 100%);
+  box-shadow:
+    inset 0 -8px 18px rgba(0, 0, 0, 0.85),
+    inset 0 2px 0 rgba(233, 225, 210, 0.12),
+    0 2px 0 rgba(151, 144, 127, 0.16);
+}
+/* cracks draw themselves before the corpse claws through */
+.ss-cracks {
+  position: absolute;
+  left: -6%;
+  bottom: 1%;
+  width: 112%;
+}
+.ss-crack-path {
+  stroke-dasharray: 340;
+  stroke-dashoffset: 340;
+  animation: ss-crack-draw 9s ease-out infinite;
+}
+.ss-crack-path.ss-crack-late { animation-delay: 0.28s; }
+@keyframes ss-crack-draw {
+  0%, 8% { stroke-dashoffset: 340; }
+  26%, 82% { stroke-dashoffset: 0; }
+  94%, 100% { stroke-dashoffset: 340; }
+}
+/* the mound halves heave apart on the burst */
+.ss-mound {
+  position: absolute;
+  bottom: 2%;
+  width: 34%;
+  z-index: 3;
+}
+.ss-mound-l { left: 12%; animation: ss-mound-left 9s ease-in-out infinite; }
+.ss-mound-r { right: 12%; animation: ss-mound-right 9s ease-in-out infinite; }
+@keyframes ss-mound-left {
+  0%, 24% { transform: translateX(0) rotate(0deg); }
+  32%, 74% { transform: translateX(-30px) rotate(-7deg); }
+  86%, 100% { transform: translateX(0) rotate(0deg); }
+}
+@keyframes ss-mound-right {
+  0%, 24% { transform: translateX(0) rotate(0deg); }
+  32%, 74% { transform: translateX(30px) rotate(7deg); }
+  86%, 100% { transform: translateX(0) rotate(0deg); }
+}
+/* the corpse — buried below the pit line, rises on the burst, sways, sinks */
+.ss-corpse {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  width: 168px;
+  z-index: 2;
+  transform: translateX(-50%);
+  animation: ss-corpse-rise 9s cubic-bezier(0.2, 0.9, 0.3, 1) infinite;
+  will-change: transform;
+}
+@keyframes ss-corpse-rise {
+  0%, 26% { transform: translateX(-50%) translateY(96%); }
+  34%, 68% { transform: translateX(-50%) translateY(6%); }
+  78% { transform: translateX(-50%) translateY(20%); }
+  88%, 100% { transform: translateX(-50%) translateY(96%); }
+}
+/* eternal swaying while above ground */
+.ss-corpse-sway {
+  transform-origin: 50% 96%;
+  animation: ss-corpse-sway 2.1s ease-in-out infinite alternate;
+}
+@keyframes ss-corpse-sway {
+  from { transform: rotate(-3.4deg); }
+  to { transform: rotate(3.4deg); }
+}
+/* dirt clods flung out on the burst — arcs driven by per-clod vars */
+.ss-clods { position: absolute; inset: 0; }
+.ss-clod {
+  position: absolute;
+  bottom: 10%;
+  width: 9px;
+  height: 7px;
+  background: #2a2040;
+  border-radius: 42% 58% 55% 45%;
+  box-shadow:
+    inset -1px -1px 0 rgba(0, 0, 0, 0.6),
+    inset 1px 1px 0 rgba(233, 225, 210, 0.16);
+  opacity: 0;
+  animation: ss-clod-fly 9s cubic-bezier(0.3, 0.6, 0.7, 1) infinite;
+  animation-delay: var(--d, 0s);
+}
+@keyframes ss-clod-fly {
+  0%, 25% { transform: translate(0, 0) scale(0); opacity: 0; }
+  29% { transform: translate(calc(var(--dx) * 0.22), calc(var(--dy) * 0.55)) scale(var(--s, 1)); opacity: 1; }
+  52% { transform: translate(var(--dx), var(--dy)) scale(var(--s, 1)); opacity: 1; }
+  72% { transform: translate(calc(var(--dx) * 1.3), 64px) scale(calc(var(--s, 1) * 0.9)); opacity: 0; }
+  100% { transform: translate(0, 0) scale(0); opacity: 0; }
+}
+/* dust coughed up at the moment of breaking */
+.ss-dust {
+  position: absolute;
+  left: 50%;
+  bottom: 4%;
+  width: 240px;
+  height: 64px;
+  transform: translateX(-50%) scale(0.4);
+  background: radial-gradient(50% 50% at 50% 60%, rgba(151, 144, 127, 0.4), transparent 70%);
+  filter: blur(7px);
+  opacity: 0;
+  animation: ss-dust-puff 9s ease-out infinite;
+}
+.ss-dust-2 { width: 340px; height: 40px; bottom: 1%; animation-delay: 0.12s; }
+@keyframes ss-dust-puff {
+  0%, 26% { opacity: 0; transform: translateX(-50%) scale(0.4); }
+  33% { opacity: 0.55; transform: translateX(-50%) scale(1); }
+  58% { opacity: 0; transform: translateX(-50%) scale(1.7); }
+  100% { opacity: 0; transform: translateX(-50%) scale(0.4); }
+}
+/* grave wisps — thin soul-light leaking from nearby plots */
+.ss-grave-wisp {
+  position: absolute;
+  bottom: 7%;
+  width: 3px;
+  height: 36px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(116, 242, 164, 0.75), rgba(116, 242, 164, 0.05));
+  filter: blur(1px);
+  opacity: 0;
+  animation: ss-wisp-rise 13s ease-in-out infinite;
+}
+@keyframes ss-wisp-rise {
+  0%, 55% { opacity: 0; transform: translateY(24px); }
+  66% { opacity: 0.8; transform: translateY(-14px); }
+  84% { opacity: 0; transform: translateY(-64px); }
+  100% { opacity: 0; transform: translateY(24px); }
+}
+
+/* ======================= 2 · SÉANCE — the house bleeds bats ================= */
+
+/* the hill the crooked house grips */
+.ss-hill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 26%;
+  filter: drop-shadow(0 -3px 8px rgba(109, 75, 180, 0.28));
+}
+/* warm leakage the house throws into the night — plus a cold wash so the
+   swarm reads as it streams away from the light */
+.ss-house-glow {
+  position: absolute;
+  right: 1%;
+  bottom: 0;
+  width: min(440px, 54vw);
+  height: 42%;
+  background:
+    radial-gradient(50% 55% at 58% 62%, rgba(255, 150, 60, 0.13), rgba(255, 109, 31, 0.05) 48%, transparent 72%),
+    radial-gradient(38% 46% at 16% 72%, rgba(109, 75, 180, 0.14), transparent 72%);
+  animation: ss-breathe 5.2s ease-in-out infinite;
+}
+/* the haunted house — crooked, lit, breathing */
+.ss-house {
+  position: absolute;
+  right: 7%;
+  bottom: 3.5%;
+  width: min(270px, 38vw);
+}
+.ss-house-shiver {
+  transform-origin: 50% 100%;
+  animation: ss-house-shiver 7.5s ease-in-out infinite;
+}
+@keyframes ss-house-shiver {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  42% { transform: rotate(0.35deg) translateY(0.5px); }
+  44% { transform: rotate(-0.5deg) translateY(-1px); }
+  46% { transform: rotate(0.2deg) translateY(0.5px); }
+  48% { transform: rotate(0deg) translateY(0); }
+  76% { transform: rotate(-0.3deg); }
+  78% { transform: rotate(0deg); }
+}
+/* windows the lightning of candlelight stutters across */
+.ss-window {
+  animation: ss-window-flicker 5.5s linear infinite;
+  filter: drop-shadow(0 0 9px rgba(255, 190, 90, 0.6));
+}
+@keyframes ss-window-flicker {
+  0%, 100% { opacity: 1; }
+  31% { opacity: 1; }
+  33% { opacity: 0.45; }
+  34% { opacity: 0.95; }
+  36% { opacity: 0.55; }
+  39% { opacity: 1; }
+  71% { opacity: 0.8; }
+  73% { opacity: 0.3; }
+  75% { opacity: 1; }
+}
+/* bats boiling out of the attic vent, streaming up-left across the sky */
+.ss-bat-out-stage { position: absolute; inset: 0; }
+.ss-bat-out {
+  position: absolute;
+  left: 83%;
+  opacity: 0;
+  animation: ss-bat-exit var(--dur, 15s) linear infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: transform;
+  /* a faint spectre-light so the swarm reads against the dark */
+  filter: drop-shadow(0 0 5px rgba(178, 158, 226, 0.65));
+}
+@keyframes ss-bat-exit {
+  0% { transform: translate(0, 0) scale(0.35); opacity: 0; }
+  3% { opacity: 1; transform: translate(-34px, 10px) scale(0.65); }
+  10% { transform: translate(-11vw, 0.5vh) scale(0.8); }
+  55% { transform: translate(-52vw, 1.5vh) scale(0.95); }
+  100% { transform: translate(-96vw, 0.5vh) scale(1.05); opacity: 1; }
+}
+/* wingbeat's sine wave, nested so it never fights the flight path */
+.ss-bat-out-wave {
+  animation: ss-bat-wave calc(var(--dur, 15s) / 9) ease-in-out infinite;
+}
+@keyframes ss-bat-wave {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(var(--amp, -48px)); }
+  70% { transform: translateY(calc(var(--amp, -48px) * 0.45)); }
+}
+.ss-bat-out-wide { left: 62%; }
+/* gnarled sentinels flanking the plot */
+.ss-tree {
+  position: absolute;
+  bottom: 8%;
+  width: clamp(80px, 10vw, 140px);
+  opacity: 0.92;
+}
+
+/* ==================== 3 · DOWNLOAD — the moon is devoured =================== */
+
+/* deep-sky wash behind everything */
+.ss-night-wash {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 90% at 78% 12%, rgba(64, 58, 120, 0.28), transparent 60%),
+    linear-gradient(180deg, rgba(16, 14, 44, 0.5), transparent 55%);
+}
+.ss-star {
+  position: absolute;
+  border-radius: 9999px;
+  background: #e9e1d2;
+  animation: ss-star-twinkle 4.2s ease-in-out infinite;
+}
+@keyframes ss-star-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 0.95; transform: scale(1.1); }
+}
+/* the moon — big, scarred, about to be eaten */
+.ss-moon {
+  position: absolute;
+  top: 7%;
+  right: 12%;
+  width: clamp(96px, 12vw, 156px);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 38% 34%, #f7f1de 0%, #e4dab8 55%, #c9bd94 100%);
+  box-shadow:
+    0 0 34px rgba(245, 238, 218, 0.35),
+    0 0 90px rgba(245, 238, 218, 0.16);
+}
+.ss-moon-halo {
+  position: absolute;
+  top: calc(7% - 34px);
+  right: calc(12% - 34px);
+  width: clamp(164px, calc(12vw + 68px), 224px);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(245, 238, 218, 0.14) 0%, rgba(245, 238, 218, 0.05) 46%, transparent 70%);
+  animation: ss-halo-breathe 7s ease-in-out infinite;
+}
+@keyframes ss-halo-breathe {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+/* the devouring clouds — banks of blurred puff crossing the whole stage */
+.ss-cloud {
+  position: absolute;
+  left: 0;
+  width: 130%;
+  height: 84px;
+  animation: ss-cloud-cross var(--dur, 40s) linear infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: transform;
+}
+@keyframes ss-cloud-cross {
+  from { transform: translateX(var(--from, 130%)) scale(var(--cs, 1)); }
+  to { transform: translateX(var(--to, -130%)) scale(var(--cs, 1)); }
+}
+.ss-cloud-puff {
+  position: absolute;
+  border-radius: 9999px;
+  background:
+    radial-gradient(closest-side, rgba(36, 27, 51, 0.95), rgba(20, 14, 34, 0.65));
+}
+/* the ghost that haunts the moonlight */
+.ss-moon-ghost {
+  position: absolute;
+  left: -90px;
+  opacity: 0;
+  animation: ss-moon-ghost-drift var(--dur, 31s) linear infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: transform;
+}
+@keyframes ss-moon-ghost-drift {
+  0% { transform: translateX(0) translateY(0); opacity: 0; }
+  7% { opacity: 0.9; }
+  30% { transform: translateX(34vw) translateY(-14px); opacity: 0.75; }
+  55% { transform: translateX(62vw) translateY(10px); opacity: 0.6; }
+  86% { opacity: 0.35; }
+  100% { transform: translateX(112vw) translateY(-20px); opacity: 0; }
+}
+/* low ground fog pooling under the moonlight */
+.ss-floor-fog {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: 0;
+  height: 26%;
+  background: radial-gradient(60% 100% at 50% 100%, rgba(90, 74, 140, 0.22), transparent 75%);
+  filter: blur(4px);
+}
+
+/* ==================== 4 · ARCHITECTURE — spirits roam the field ============= */
+
+/* the grave row the wisps rise out of */
+.ss-stone-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 22%;
+}
+/* the lone votive keeping watch over the plots */
+.ss-candle {
+  position: absolute;
+  bottom: 9.5%;
+  left: 30%;
+  width: 8px;
+}
+
+/* ======================= 5 · GRIMOIRE — ghosts walk the rows ================ */
+
+/* embers off the scribes' candles, climbing and dying */
+.ss-ember {
+  position: absolute;
+  bottom: 13%;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, #ffd27a 0%, #ff6d1f 60%, transparent 100%);
+  opacity: 0;
+  animation: ss-ember-rise 7s ease-in infinite;
+}
+@keyframes ss-ember-rise {
+  0%, 8% { opacity: 0; transform: translate(0, 0) scale(var(--s, 1)); }
+  18% { opacity: 0.85; }
+  45% { transform: translate(9px, -64px) scale(calc(var(--s, 1) * 0.9)); }
+  72% { opacity: 0.4; transform: translate(-7px, -118px) scale(calc(var(--s, 1) * 0.75)); }
+  92%, 100% { opacity: 0; transform: translate(4px, -158px) scale(calc(var(--s, 1) * 0.5)); }
+}
+
+/* ====================== 6 · RESEARCH — the dead walk out ==================== */
+
+/* the forgotten lane the shambler haunts */
+.ss-road {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 17%;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(151, 144, 127, 0.07) 46px 52px),
+    linear-gradient(180deg, #0d0819 0%, #0a0614 100%);
+}
+/* violet wash behind the walking strip so the silhouette reads */
+.ss-walk-glow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38%;
+  background:
+    radial-gradient(55% 70% at 50% 88%, rgba(109, 75, 180, 0.20), transparent 72%),
+    radial-gradient(40% 55% at 15% 70%, rgba(255, 210, 122, 0.06), transparent 70%);
+}
+/* the street lamp — its halo gutters like a dying candle */
+.ss-lamp {
+  position: absolute;
+  bottom: 14.5%;
+  left: 13%;
+  width: 46px;
+}
+.ss-lamp-halo {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  width: 150px;
+  height: 150px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 210, 122, 0.30) 0%, rgba(255, 150, 60, 0.12) 42%, transparent 70%);
+  pointer-events: none;
+}
+/* the fence he shambles past, indifferent */
+.ss-walk-fence {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 13%;
+  width: 100%;
+  height: 13%;
+  opacity: 0.85;
+}
+
+/* ========================== 7 · FAQ — the storm breaks ====================== */
+
+/* cold storm light pressing down */
+.ss-storm-wash {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(90% 70% at 50% -10%, rgba(52, 72, 128, 0.30), transparent 65%),
+    linear-gradient(180deg, rgba(24, 32, 62, 0.42), transparent 50%);
+}
+/* the hill and tree the lightning annotates */
+.ss-storm-hill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 24%;
+}
+.ss-storm-tree {
+  position: absolute;
+  bottom: 19%;
+  left: 7%;
+  width: clamp(84px, 10vw, 132px);
+}
+/* the flash — two strobes, then a long held dark; 19s cycle */
+.ss-lightning {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 55% at 70% 0%, rgba(226, 233, 255, 0.5), transparent 62%),
+    linear-gradient(180deg, rgba(200, 212, 255, 0.22), transparent 55%);
+  opacity: 0;
+  animation: ss-lightning-flash 19s linear infinite;
+}
+@keyframes ss-lightning-flash {
+  0%, 50.9% { opacity: 0; }
+  51.2% { opacity: 0.9; }
+  52.4% { opacity: 0.1; }
+  53.6% { opacity: 0.7; }
+  55.4% { opacity: 0; }
+  57.2% { opacity: 0.28; }
+  58.6%, 100% { opacity: 0; }
+}
+
+/* ------------------------- small screens: condense ------------------------ */
+
+@media (max-width: 640px) {
+  .ss-house { right: 4%; }
+  .ss-tree { opacity: 0.55; }
+  .ss-erupt-stage { height: 40%; }
+  .ss-corpse { width: 128px; }
+  .ss-moon { right: 4%; top: 3%; width: 76px; }
+  .ss-moon-halo { right: calc(4% - 22px); top: calc(3% - 22px); width: 120px; }
+  .ss-lamp { width: 36px; }
+  .ss-lamp-halo { width: 110px; height: 110px; }
+  .ss-clod { display: none; }
+}
+
+/* ------------------- reduced motion: still dioramas ---------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ss-ground-glow, .ss-ground-rows, .ss-crack-path, .ss-mound-l, .ss-mound-r,
+  .ss-corpse, .ss-corpse-sway, .ss-clod, .ss-dust, .ss-grave-wisp, .ss-burst-glow,
+  .ss-house-shiver, .ss-house-glow, .ss-window, .ss-bat-out, .ss-bat-out-wave,
+  .ss-star, .ss-moon-halo, .ss-cloud, .ss-moon-ghost, .ss-ember,
+  .ss-lamp-halo, .ss-lightning, .ss-walk-glow, .ss-halo-breathe {
+    animation: none !important;
+  }
+  /* freeze each world at its most photogenic moment */
+  .ss-corpse { transform: translateX(-50%) translateY(10%); }
+  .ss-crack-path { stroke-dashoffset: 0; }
+  .ss-clod, .ss-bat-out, .ss-grave-wisp, .ss-dust, .ss-lightning, .ss-moon-ghost { opacity: 0 !important; }
+  .ss-star { opacity: 0.8; }
+  .ss-cloud { transform: translateX(24%) scale(var(--cs, 1)); }
+}
