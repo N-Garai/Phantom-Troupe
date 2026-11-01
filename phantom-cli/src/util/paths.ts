@@ -50,6 +50,12 @@ export const DEFAULT_CONFIG: Config = {
   keepWakeWord: true,
 };
 
+/** per-provider model defaults — Gemma 2 is Ollama-only; Gemma API hosts Gemma 4 only */
+export const MODEL_DEFAULTS: Record<Config["provider"], string> = {
+  ollama: "gemma3:4b",
+  "gemma-api": "gemma-4-26b-a4b-it",
+};
+
 export function loadConfig(): Config {
   ensureHome();
   try {

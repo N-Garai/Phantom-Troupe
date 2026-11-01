@@ -11,7 +11,7 @@ export type Brain = {
 export function getBrain(cfg = loadConfig()): Brain {
   if (cfg.provider === "gemma-api") {
     return {
-      available: async () => Boolean(process.env.GEMMA_API_KEY),
+      available: async () => Boolean(cfg.gemmaApiKey ?? process.env.GEMMA_API_KEY),
       ask: (system, user, timeoutMs) => askGemmaApi(cfg, system, user, timeoutMs),
     };
   }

@@ -17,6 +17,16 @@ export function stop() {
     }
     say.dim(" all memory kept in ~/.phantom — 'phantom' wakes them again.");
 }
+/** mask anything that looks like a token/key so status never leaks secrets */
+function maskModel(model) {
+    if (!model)
+        return model;
+    // JWTs, API keys, and long hex/base64 blobs — show only first 6 + last 4 chars
+    if (model.length > 20 && (/^[A-Za-z0-9\-_.+/]{20,}$/.test(model) || model.includes("."))) {
+        return model.slice(0, 6) + "…" + model.slice(-4);
+    }
+    return model;
+}
 /** `phantom status` — the roster. */
 export function status() {
     const cfg = loadConfig();
@@ -33,7 +43,7 @@ export function status() {
     catch { }
     say.bone("┌─ troupe roster " + "─".repeat(34));
     say.bone(`│ helper      : ${alive ? "awake" : "asleep"}${alive ? ` (pid ${fs.readFileSync(FILES.daemonPid, "utf8").trim()})` : ""}`);
-    say.bone(`│ brain       : ${cfg.provider} · ${cfg.model} · idle unload ${cfg.idleUnloadMinutes} min`);
+    say.bone(`│ brain       : ${cfg.provider} · ${maskModel(cfg.model)} · idle unload ${cfg.idleUnloadMinutes} min`);
     say.bone(`│ corpses     : ${corpses} filed in morgue.jsonl`);
     say.bone(`│ graves      : ${graves} tended in graves.jsonl`);
     say.bone("└" + "─".repeat(50));

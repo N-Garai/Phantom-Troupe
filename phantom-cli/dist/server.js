@@ -161,10 +161,16 @@ export function createServer() {
                     ...(guard ? { guardSeverity: guard.severity, guardPattern: guard.pattern } : {}),
                 };
                 appendCorpus(corpse);
-                void summon("autopsy", corpse).then((v) => {
-                    updateLastCorpse(cmd, { dx: v.text });
-                    broadcast("verdict", v);
-                });
+                // await the autopsy so the dx is written before the response returns —
+                // but never block the exec reply on a slow brain (5s hard ceiling).
+                const verdict = await Promise.race([
+                    summon("autopsy", corpse),
+                    new Promise((resolve) => setTimeout(() => resolve(null), 5000)),
+                ]).catch(() => null);
+                if (verdict) {
+                    updateLastCorpse(cmd, { dx: verdict.text });
+                    broadcast("verdict", verdict);
+                }
             }
             return json(res, 200, { ...out, ms: Date.now() - t0, guard });
         }
@@ -221,6 +227,23 @@ export function createServer() {
                 return json(res, 200, { enabled: false, traces: [] });
             }
             return json(res, 200, { enabled: true, traces: getTraces() });
+        }
+        if (url.pathname === "/api/morgue/autopsy-all" && req.method === "POST") {
+            const corpses = readMorgue(500);
+            let done = 0;
+            for (const c of corpses) {
+                if (c.dx)
+                    continue;
+                try {
+                    const verdict = await summon("autopsy", c).catch(() => null);
+                    if (verdict) {
+                        updateLastCorpse(c.cmd, { dx: verdict.text });
+                        done++;
+                    }
+                }
+                catch { }
+            }
+            return json(res, 200, { retroacted: done, total: corpses.length });
         }
         json(res, 404, { error: "no such haunt" });
     });

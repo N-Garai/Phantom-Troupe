@@ -14,7 +14,7 @@ export type BrainReply = { text: string; tokens?: number };
  * back to the raw text. This kills "the model invented a flag" class bugs.
  */
 export async function askGemmaApi(cfg: Config, system: string, user: string, timeoutMs = 30_000): Promise<BrainReply> {
-  const key = process.env.GEMMA_API_KEY;
+  const key = cfg.gemmaApiKey ?? process.env.GEMMA_API_KEY;
   if (!key) throw new Error("GEMMA_API_KEY is not set");
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
@@ -57,7 +57,7 @@ export async function askGemmaApiStructured<T extends z.ZodTypeAny>(
   maxRetries: number = 3,
   timeoutMs: number = 30_000,
 ): Promise<z.infer<T>> {
-  const key = process.env.GEMMA_API_KEY;
+  const key = cfg.gemmaApiKey ?? process.env.GEMMA_API_KEY;
   if (!key) throw new Error("GEMMA_API_KEY is not set");
 
   const schemaJson = JSON.stringify(schema._def, null, 2);

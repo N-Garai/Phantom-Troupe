@@ -36,7 +36,7 @@ export async function settings(): Promise<void> {
     say.dim("│ Enter your Gemma API key — stored in ~/.phantom/config.json (local only):");
     gemmaApiKey = (await question("│ API key: ")).trim();
     say.dim("│");
-    model = (await question("│ Model [gemma-2b-it]: ")).trim() || "gemma-2b-it";
+    model = (await question("│ Model [gemma-4-26b-a4b-it]: ")).trim() || "gemma-4-26b-a4b-it";
   } else {
     model = (await question("│ Model [gemma3:4b]: ")).trim() || "gemma3:4b";
   }

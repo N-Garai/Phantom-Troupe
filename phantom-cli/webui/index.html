@@ -118,7 +118,8 @@
 
 <main id="tab-morgue">
   <h2 class="sec">The morgue — failed commands, with causes of death</h2>
-  <div class="panel" style="padding:6px"><table id="morgueTable"><thead><tr><th>when</th><th>command</th><th>exit</th><th>coroner's report</th></tr></thead><tbody></tbody></table></div>
+  <div class="panel" style="padding:6px"><table id="morgueTable"><thead><tr><th>when</th><th>command</th><th>exit</th><th>coroner's report</th></tr></thead><tbody></tbody></table>
+  <div class="row" style="margin-top:8px"><button class="btn spectre" id="autoAutopsy">⚰️ file autopsy for every corpse without one</button></div></div>
 </main>
 
 <main id="tab-memory">
@@ -242,7 +243,8 @@ async function loadGraves(){const r=await jfetch('/api/graves');const tb=documen
     tr.innerHTML='<td>'+esc(g.name)+'</td><td>'+esc(g.kind)+'</td><td>'+(g.daysDead?g.daysDead+'d':'—')+'</td><td>'+esc((g.summary||'').slice(0,90))+'</td><td><span class="badge '+(g.verdict||'retire')+'">'+esc(g.verdict||'pending')+'</span></td>';tb.appendChild(tr)})}
 async function loadMorgue(){const r=await jfetch('/api/morgue?limit=40');const tb=document.querySelector('#morgueTable tbody');tb.innerHTML='';
   r.corpses.forEach(c=>{const tr=document.createElement('tr');
-    tr.innerHTML='<td>'+esc((c.ts||'').slice(0,16).replace('T',' '))+'</td><td style="color:var(--bone)">'+esc(c.cmd)+'</td><td>'+c.exit+'</td><td>'+esc((c.dx||'—').slice(0,140))+'</td>';tb.appendChild(tr)})}
+    tr.innerHTML='<td>'+esc((c.ts||'').slice(0,16).replace('T',' '))+'</td><td style="color:var(--bone)">'+esc(c.cmd)+'</td><td>'+c.exit+'</td><td>'+esc((c.dx||'no autopsy filed yet').slice(0,140))+'</td>';tb.appendChild(tr)})}
+$('#autoAutopsy').onclick=async()=>{const r=await jfetch('/api/morgue/autopsy-all',{method:'POST'});sys('filed '+r.retroacted+'/'+r.total+' missing autopsy reports');loadMorgue()};
 const tabObs=new MutationObserver(()=>{if($('#tab-graveyard').classList.contains('active'))loadGraves();if($('#tab-morgue').classList.contains('active'))loadMorgue()});
 tabObs.observe($('#tab-graveyard'),{attributes:true,attributeFilter:['class']});tabObs.observe($('#tab-morgue'),{attributes:true,attributeFilter:['class']});
 

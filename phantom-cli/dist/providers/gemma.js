@@ -9,7 +9,7 @@
  * back to the raw text. This kills "the model invented a flag" class bugs.
  */
 export async function askGemmaApi(cfg, system, user, timeoutMs = 30_000) {
-    const key = process.env.GEMMA_API_KEY;
+    const key = cfg.gemmaApiKey ?? process.env.GEMMA_API_KEY;
     if (!key)
         throw new Error("GEMMA_API_KEY is not set");
     const ctrl = new AbortController();
@@ -41,7 +41,7 @@ export async function askGemmaApi(cfg, system, user, timeoutMs = 30_000) {
  * Returns the parsed object on success, or throws on final failure.
  */
 export async function askGemmaApiStructured(cfg, system, user, schema, maxRetries = 3, timeoutMs = 30_000) {
-    const key = process.env.GEMMA_API_KEY;
+    const key = cfg.gemmaApiKey ?? process.env.GEMMA_API_KEY;
     if (!key)
         throw new Error("GEMMA_API_KEY is not set");
     const schemaJson = JSON.stringify(schema._def, null, 2);
