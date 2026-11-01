@@ -19,8 +19,17 @@ A router dispatches each moment to exactly one ghost — idle agents cost nothin
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/phantom-troupe/phantom-troupe/main/install.sh | bash
-# or
+# From the release zip (every device):
+unzip phantom-troupe.zip
+cd phantom-troupe/phantom-cli
+npm install && npm link
+phantom init          # writes hooks for your shell
+phantom graveyard     # local séance UI at http://127.0.0.1:7313
+```
+
+Or, if the troupe is published:
+
+```bash
 npm i -g phantom-troupe && phantom init
 ```
 

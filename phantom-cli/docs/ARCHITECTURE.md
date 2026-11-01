@@ -19,6 +19,10 @@
 │    │            Interpreter / Exorcist                            │
 │    │      (open agent framework, optional;                        │
 │    │       deterministic fallbacks always available)              │
+│    ├─ Exorcist pre-run guard                                     │
+│    │      — /api/exec inspects every command before execution;   │
+│    │      lethal/grave commands are blocked unless confirmed     │
+│    │      with the Dead Man's Hand (confirm: true)               │
 │    ├─ brain: local open-weight model (ollama)                     │
 │    │         or hosted open-weight model (gemma-api)              │
 │    ├─ idle reaper → unloads model after ⟨idleUnloadMinutes⟩       │
@@ -57,3 +61,21 @@ Privacy, 2017 (<https://doi.org/10.1109/SP.2017.31>): developers paste
 working-looking code without understanding it, and the copy rides along with
 what they don't know. The whole troupe exists to keep that understanding
 inside the local shell instead.
+
+## Command reference
+
+| Command | Purpose |
+|---------|---------|
+| `phantom` / `phantom start` | Wake the helper in the background |
+| `phantom graveyard` / `phantom web` | Open local séance UI at 127.0.0.1:7313 |
+| `phantom status` | Roster: brain, corpses, graves |
+| `phantom seance` | Run the nightly sweep now |
+| `phantom stop` | Sleep — all memory kept |
+| `phantom unhook` | Remove shell capture only |
+| `phantom uninstall` | Remove hooks, timers — asks before deleting `~/.phantom` |
+| `phantom init` | (Re)install hooks + config |
+| `phantom settings` | Choose brain (ollama vs gemma-api) + store API key |
+| `phantom guard <cmd>` | Exorcist pre-run gate — inspect before execution |
+| `phantom autopsy <cmd>` | Coroner cause-of-death report for any command |
+| `phantom explain <cmd>` | Interpreter: WHAT / WHEN / DANGER for any command |
+| `phantom _capture <exit> <cmd>` | Internal: shell-hook capture (not for direct use) |

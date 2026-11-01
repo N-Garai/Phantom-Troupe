@@ -2,6 +2,9 @@ import { loadConfig } from "./util/paths.js";
 let mod = null;
 let probePromise = null;
 let initialized = false;
+/** Recent traces kept locally for the UI showcase (only populated when Sentry DSN is configured). */
+const traces = [];
+const MAX_TRACES = 200;
 const PACKAGE_VERSION = (() => {
     try {
         return require("../package.json").version;
@@ -46,15 +49,32 @@ export function initSentry() {
 export function isSentryReady() {
     return initialized && mod != null;
 }
+/** Recent traces for the UI showcase (only when Sentry DSN is configured). */
+export function getTraces() {
+    return [...traces].reverse();
+}
 /** Run work inside a span when Sentry is present; otherwise just run it. */
 export async function traced(op, name, fn) {
     await probe();
     if (!mod)
         return fn();
     try {
-        return await mod.startSpan({ op, name }, async () => fn());
+        return await mod.startSpan({ op, name }, async () => {
+            const t0 = Date.now();
+            try {
+                return await fn();
+            }
+            finally {
+                traces.push({ op, name, attributes: { latencyMs: Date.now() - t0 }, ts: Date.now() });
+                if (traces.length > MAX_TRACES)
+                    traces.shift();
+            }
+        });
     }
     catch (err) {
+        traces.push({ op, name, attributes: { error: String(err.message), latencyMs: 0 }, ts: Date.now() });
+        if (traces.length > MAX_TRACES)
+            traces.shift();
         // surface the work's own error untouched, but also capture it in Sentry
         try {
             mod.captureException(err, { contexts: { operation: { op, name } } });

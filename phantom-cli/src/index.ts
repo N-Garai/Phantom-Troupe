@@ -3,6 +3,10 @@ import { init, start } from "./commands/init.js";
 import { stop, status, uninstall } from "./commands/lifecycle.js";
 import { capture } from "./commands/capture.js";
 import { settings } from "./commands/settings.js";
+import { guard } from "./commands/exorcist.js";
+import { autopsy } from "./commands/autopsy.js";
+import { explain } from "./commands/explain.js";
+import { resurrect } from "./commands/resurrect.js";
 import { runSeance } from "./seance.js";
 import { startDaemon, ensureDaemonAndOpen } from "./server.js";
 import { loadConfig } from "./util/paths.js";
@@ -68,6 +72,22 @@ async function main(): Promise<void> {
       await settings();
       return;
 
+    case "guard":
+      await guard(rest.join(" "));
+      return;
+
+    case "autopsy":
+      await autopsy(rest.join(" "));
+      return;
+
+    case "explain":
+      await explain(rest.join(" "));
+      return;
+
+    case "resurrect":
+      await resurrect(rest[0] ?? "", flags.has("--apply"));
+      return;
+
     case "_capture":
       await capture(rest[0] ?? "1", rest.slice(1).join(" "));
       return;
@@ -92,6 +112,10 @@ async function main(): Promise<void> {
       say.dim("   phantom uninstall    remove everything (asks about the bones)");
       say.dim("   phantom init         (re)install hooks + config");
       say.dim("   phantom settings     choose brain (ollama vs gemma-api) + store API key");
+      say.dim("   phantom guard <cmd>   inspect a command before it runs (Exorcist pre-run gate)");
+      say.dim("   phantom autopsy <cmd> Coroner cause-of-death report for any command");
+      say.dim("   phantom explain <cmd> Interpreter: WHAT / WHEN / DANGER for any command");
+      say.dim("   phantom resurrect <name> [--apply]  Understudy: dry-run or rewrite a dead script");
       return;
 
     default:

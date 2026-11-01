@@ -33,6 +33,10 @@ let mod: SentryModule | null = null;
 let probePromise: Promise<void> | null = null;
 let initialized = false;
 
+/** Recent traces kept locally for the UI showcase (only populated when Sentry DSN is configured). */
+const traces: Array<{ op: string; name: string; attributes?: Record<string, unknown>; ts: number }> = [];
+const MAX_TRACES = 200;
+
 const PACKAGE_VERSION = (() => {
   try {
     return require("../package.json").version;
@@ -78,13 +82,28 @@ export function isSentryReady(): boolean {
   return initialized && mod != null;
 }
 
+/** Recent traces for the UI showcase (only when Sentry DSN is configured). */
+export function getTraces(): Array<{ op: string; name: string; attributes?: Record<string, unknown>; ts: number }> {
+  return [...traces].reverse();
+}
+
 /** Run work inside a span when Sentry is present; otherwise just run it. */
 export async function traced<T>(op: string, name: string, fn: () => Promise<T>): Promise<T> {
   await probe();
   if (!mod) return fn();
   try {
-    return await mod.startSpan({ op, name }, async () => fn());
+    return await mod.startSpan({ op, name }, async () => {
+      const t0 = Date.now();
+      try {
+        return await fn();
+      } finally {
+        traces.push({ op, name, attributes: { latencyMs: Date.now() - t0 }, ts: Date.now() });
+        if (traces.length > MAX_TRACES) traces.shift();
+      }
+    });
   } catch (err) {
+    traces.push({ op, name, attributes: { error: String((err as Error).message), latencyMs: 0 }, ts: Date.now() });
+    if (traces.length > MAX_TRACES) traces.shift();
     // surface the work's own error untouched, but also capture it in Sentry
     try {
       mod.captureException(err, { contexts: { operation: { op, name } } });

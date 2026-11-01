@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import readline from "node:readline/promises";
 import { FILES, ensureHome, loadConfig, saveConfig } from "../util/paths.js";
 import { say } from "../util/log.js";
@@ -15,42 +14,6 @@ export async function settings(): Promise<void> {
 
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const question = (q: string): Promise<string> => rl.question(q);
-
-  const hide = (q: string): Promise<string> => {
-    return new Promise((resolve) => {
-      process.stdout.write(q);
-      process.stdin.setRawMode?.(true);
-      process.stdin.pause();
-      const chunks: Buffer[] = [];
-      const onData = (d: Buffer) => {
-        const b = d as Buffer;
-        if (b.equals(Buffer.from("\u0003"))) {
-          process.stdin.removeListener("data", onData);
-          process.stdin.setRawMode?.(false);
-          process.stdin.resume();
-          rl.close();
-          process.exit(130);
-        }
-        if (b.equals(Buffer.from("\r")) || b.equals(Buffer.from("\n"))) {
-          process.stdout.write("\n");
-          process.stdin.removeListener("data", onData);
-          process.stdin.setRawMode?.(false);
-          process.stdin.resume();
-          resolve(Buffer.concat(chunks).toString().trim());
-          return;
-        }
-        if (b.equals(Buffer.from("\u007f")) || b.equals(Buffer.from("\b"))) {
-          if (chunks.length > 0) {
-            chunks.pop();
-            process.stdout.write("\b \b");
-          }
-          return;
-        }
-        chunks.push(b);
-      };
-      process.stdin.on("data", onData);
-    });
-  };
 
   say.bone("┌─ Phantom Troupe — Settings");
   say.dim("│");
@@ -70,8 +33,8 @@ export async function settings(): Promise<void> {
 
   if (provider === "gemma-api") {
     say.dim("│");
-    say.dim("│ Enter your Gemma API key (input hidden — stored in ~/.phantom/config.json):");
-    gemmaApiKey = await hide("│ API key: ");
+    say.dim("│ Enter your Gemma API key — stored in ~/.phantom/config.json (local only):");
+    gemmaApiKey = (await question("│ API key: ")).trim();
     say.dim("│");
     model = (await question("│ Model [gemma-2b-it]: ")).trim() || "gemma-2b-it";
   } else {

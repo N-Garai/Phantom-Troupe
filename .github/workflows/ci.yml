@@ -33,6 +33,8 @@ jobs:
         run: npm run typecheck
       - name: Build
         run: npm run build
+      - name: Test suite — 13 suites across store, exorcist, server
+        run: npm test
       - name: Zero-dependency oath — the CLI must run bare
         run: |
           mv node_modules phantom-nm-tmp
@@ -83,6 +85,8 @@ jobs:
         run: |
           npm run typecheck
           npm run build
+      - name: Test suite
+        run: npm test
       - name: Smoke — PowerShell profile hooks are installed once
         run: |
           node dist/index.js init

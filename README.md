@@ -23,30 +23,27 @@ phantom-troupe/
 
 ## Quick start (60 seconds)
 
-**macOS / Linux:**
+**From the release zip (every device):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/N-Garai/Phantom-Troupe/main/phantom-cli/install.sh | bash
+unzip phantom-troupe.zip
+cd phantom-troupe/phantom-cli
+npm install && npm link
 phantom                       # wake the troupe (background, loopback-only)
 phantom graveyard             # open the séance UI in your browser
 ```
 
-**Windows PowerShell:**
-
-```powershell
-irm https://raw.githubusercontent.com/N-Garai/Phantom-Troupe/main/phantom-cli/install.ps1 | iex
-phantom
-phantom graveyard
-```
-
-Prefer doing it by hand?
+**Or, one-liner installers (macOS / Linux / Windows):**
 
 ```bash
-npm i -g phantom-troupe && phantom init    # hooks written for your shell
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/N-Garai/Phantom-Troupe/main/phantom-cli/install.sh | bash
+
+# Windows PowerShell
+irm https://raw.githubusercontent.com/N-Garai/Phantom-Troupe/main/phantom-cli/install.ps1 | iex
 ```
 
-Detailed instructions — every platform and troubleshooting — live in
-[INSTALL.md](./INSTALL.md).
+Prefer doing it by hand? See [INSTALL.md](./INSTALL.md) for every platform and troubleshooting.
 
 ## Requirements
 
@@ -67,6 +64,11 @@ Detailed instructions — every platform and troubleshooting — live in
 | `phantom seance` | run the nightly graveyard sweep right now |
 | `phantom stop` | put them to sleep — all memory is kept |
 | `phantom uninstall` | remove hooks + timer; asks before deleting `~/.phantom` |
+| `phantom init` | (re)install hooks + config |
+| `phantom settings` | choose brain (ollama vs gemma-api) + store API key |
+| `phantom guard <cmd>` | Exorcist pre-run gate — inspect before execution |
+| `phantom autopsy <cmd>` | Coroner cause-of-death report for any command |
+| `phantom explain <cmd>` | Interpreter: WHAT / WHEN / DANGER for any command |
 
 ## License
 

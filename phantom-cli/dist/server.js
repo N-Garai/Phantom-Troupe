@@ -11,6 +11,8 @@ import { inspectGuard, exorcistBark } from "./guard.js";
 import { runSeance } from "./seance.js";
 import { Reaper } from "./reaper.js";
 import { initSentry } from "./telemetry.js";
+import { getTraces, isSentryReady } from "./telemetry.js";
+import { warmupOllama } from "./providers/ollama.js";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WEBUI = path.join(HERE, "..", "webui", "index.html");
 const clients = new Set();
@@ -128,15 +130,25 @@ export function createServer() {
                 return json(res, 400, { error: "the void cannot be executed" });
             if (cmd.length > 2000)
                 return json(res, 400, { error: "even ghosts have limits (2000 chars)" });
-            // the Exorcist speaks BEFORE the shell does — deterministic bark first
-            // (instant), then the model voice deepens the verdict when it matters
+            // THE EXORCIST SPEAKS BEFORE THE SHELL — pre-run guard
+            // If the command is lethal/grave and the user hasn't confirmed,
+            // return guarded:true and NEVER run the shell.
             const guard = inspectGuard(cmd);
-            if (guard) {
+            if (guard && guard.severity !== "low" && body.confirm !== true) {
                 broadcast("verdict", { agent: "exorcist", text: exorcistBark(guard), engine: "fallback" });
-                if (guard.severity !== "low") {
-                    void summon("guard", { cmd, guard }).then((v) => broadcast("verdict", { ...v, agent: "exorcist" }));
-                }
+                return json(res, 200, {
+                    guarded: true,
+                    severity: guard.severity,
+                    pattern: guard.pattern,
+                    reason: guard.reason,
+                    cmd,
+                    ms: 0,
+                    stdout: "",
+                    stderr: "",
+                    exit: -1,
+                });
             }
+            // user accepted the Dead Man's Hand — run and record it
             reaper.touch();
             const t0 = Date.now();
             const out = await runShell(cmd);
@@ -146,9 +158,9 @@ export function createServer() {
                     cmd,
                     exit: out.exit,
                     stderrTail: out.stderr.slice(-400),
+                    ...(guard ? { guardSeverity: guard.severity, guardPattern: guard.pattern } : {}),
                 };
                 appendCorpus(corpse);
-                // let the Coroner speak — async, so the shell reply is instant
                 void summon("autopsy", corpse).then((v) => {
                     updateLastCorpse(cmd, { dx: v.text });
                     broadcast("verdict", v);
@@ -204,6 +216,12 @@ export function createServer() {
             reaper.restart();
             return json(res, 200, cfg);
         }
+        if (url.pathname === "/api/sentry-traces" && req.method === "GET") {
+            if (!isSentryReady()) {
+                return json(res, 200, { enabled: false, traces: [] });
+            }
+            return json(res, 200, { enabled: true, traces: getTraces() });
+        }
         json(res, 404, { error: "no such haunt" });
     });
 }
@@ -212,10 +230,18 @@ export function startDaemon() {
     initSentry();
     const cfg = loadConfig();
     const server = createServer();
-    server.listen(cfg.port, "127.0.0.1", () => {
+    server.listen(cfg.port, "127.0.0.1", async () => {
         fs.writeFileSync(FILES.daemonPid, String(process.pid));
         console.log(`[phantom] the troupe is awake — http://127.0.0.1:${cfg.port} (pid ${process.pid})`);
         reaper.restart();
+        // cold-start warmup: ping Ollama so the model is loaded before the first autopsy
+        if (cfg.provider === "ollama") {
+            const ok = await warmupOllama(cfg).catch(() => false);
+            if (ok)
+                console.log(`[phantom] brain warmed — ${cfg.model} resident in RAM`);
+            else
+                console.log(`[phantom] brain not reachable at ${cfg.ollamaUrl} — deterministic fallback stands ready`);
+        }
     });
     const stop = () => {
         try {

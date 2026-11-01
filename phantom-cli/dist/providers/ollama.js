@@ -3,6 +3,7 @@ export async function askOllama(cfg, system, user, timeoutMs = 20_000) {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), timeoutMs);
     try {
+        const keepAlive = process.env.OLLAMA_KEEP_ALIVE ?? "5m";
         const res = await fetch(`${cfg.ollamaUrl}/v1/chat/completions`, {
             method: "POST",
             headers: { "content-type": "application/json" },
@@ -14,6 +15,7 @@ export async function askOllama(cfg, system, user, timeoutMs = 20_000) {
                 ],
                 stream: false,
                 options: { temperature: 0.4 },
+                keep_alive: keepAlive,
             }),
             signal: ctrl.signal,
         });
@@ -25,6 +27,16 @@ export async function askOllama(cfg, system, user, timeoutMs = 20_000) {
     }
     finally {
         clearTimeout(t);
+    }
+}
+/** Warmup ping — calls /api/tags so Ollama loads the model into RAM before the first autopsy. */
+export async function warmupOllama(cfg) {
+    try {
+        const res = await fetch(`${cfg.ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(5000) });
+        return res.ok;
+    }
+    catch {
+        return false;
     }
 }
 /** Unload the model NOW (the reaper's whole job). Returns true if Ollama answered. */

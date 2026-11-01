@@ -7,6 +7,7 @@ export async function askOllama(cfg: Config, system: string, user: string, timeo
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
+    const keepAlive = process.env.OLLAMA_KEEP_ALIVE ?? "5m";
     const res = await fetch(`${cfg.ollamaUrl}/v1/chat/completions`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -18,6 +19,7 @@ export async function askOllama(cfg: Config, system: string, user: string, timeo
         ],
         stream: false,
         options: { temperature: 0.4 },
+        keep_alive: keepAlive,
       }),
       signal: ctrl.signal,
     });
@@ -27,6 +29,16 @@ export async function askOllama(cfg: Config, system: string, user: string, timeo
     return { text, tokens: j.usage?.total_tokens };
   } finally {
     clearTimeout(t);
+  }
+}
+
+/** Warmup ping — calls /api/tags so Ollama loads the model into RAM before the first autopsy. */
+export async function warmupOllama(cfg: Config): Promise<boolean> {
+  try {
+    const res = await fetch(`${cfg.ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(5000) });
+    return res.ok;
+  } catch {
+    return false;
   }
 }
 

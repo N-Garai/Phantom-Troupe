@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const BEGIN = "# >>> phantom-troupe >>> (managed block — do not edit)";
 const END = "# <<< phantom-troupe <<<";
 
-export type ShellKind = "zsh" | "bash" | "powershell" | "unknown";
+export type ShellKind = "zsh" | "bash" | "powershell" | "fish" | "unknown";
 
 /**
  * Absolute path to the compiled entry point, so the hooks can call the CLI
@@ -105,12 +105,43 @@ function powershellSnippet(): string {
   ].join("\n");
 }
 
+/* ----------------------------------------------------------- fish ----------- */
+/**
+ * Fish has no preexec hook; it uses fish_postexec which runs after every
+ * command with $status holding the exit code. We track the last command via
+ * fish_preexec (before it runs) and capture on fish_postexec when $status != 0.
+ */
+function fishSnippet(): string {
+  return [
+    BEGIN,
+    "function fish_preexec --on-event fish_preexec",
+    "  set -g __phantom_last_cmd $argv[1]",
+    "end",
+    "function fish_postexec --on-event fish_postexec",
+    "  set -l ec $status",
+    "  if test $ec -ne 0",
+    "    and set -q __phantom_last_cmd",
+    "    and not string match -q 'phantom*' $__phantom_last_cmd",
+    "    phantom _capture $ec \"$__phantom_last_cmd\" >/dev/null 2>&1 &",
+    "    set -e __phantom_last_cmd",
+    "  end",
+    "end",
+    END,
+  ].join("\n");
+}
+
+/* ----------------------------------------------------------- dispatch ------ */
+
 export function snippetFor(kind: ShellKind): string {
   switch (kind) {
     case "zsh":
       return zshSnippet();
+    case "bash":
+      return bashSnippet();
     case "powershell":
       return powershellSnippet();
+    case "fish":
+      return fishSnippet();
     default:
       return bashSnippet();
   }
@@ -157,6 +188,7 @@ export function rcCandidates(): { kind: ShellKind; rc: string }[] {
     { kind: "bash", rc: path.join(home, ".bash_profile") },
     { kind: "bash", rc: path.join(home, ".profile") },
     { kind: "zsh", rc: path.join(home, ".zshrc") },
+    { kind: "fish", rc: path.join(home, ".config", "fish", "config.fish") },
   ];
   for (const rc of pwshProfiles()) out.push({ kind: "powershell", rc });
   return out;
@@ -166,6 +198,7 @@ export function detectShell(): { kind: ShellKind; rc: string } {
   if (process.platform === "win32") return { kind: "powershell", rc: pwshProfiles()[0] ?? "" };
   const shell = process.env.SHELL ?? "";
   if (shell.includes("zsh")) return { kind: "zsh", rc: path.join(os.homedir(), ".zshrc") };
+  if (shell.includes("fish")) return { kind: "fish", rc: path.join(os.homedir(), ".config", "fish", "config.fish") };
   return { kind: "bash", rc: path.join(os.homedir(), ".bashrc") };
 }
 

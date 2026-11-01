@@ -18,3 +18,4 @@ All plain files. Audit with `cat`. Delete and the dead are truly gone.
 ## Network surface
 - The séance UI binds to `127.0.0.1` only and rejects non-loopback connections.
 - The helper makes outbound calls only to your configured brain.
+- The Exorcist pre-run guard is purely deterministic — no model, no network, instant verdicts.

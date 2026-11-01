@@ -182,6 +182,29 @@ $('#execForm').onsubmit=async e=>{
   try{
     const r=await jfetch('/api/exec',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({cmd})});
     term.lastChild.remove();
+    if(r.guarded){
+      line('err','['+r.severity.toUpperCase()+'] '+r.pattern+' — '+esc(r.reason));
+      line('err','the Exorcist placed a hand on your shoulder. This will not run until you accept the hand.');
+      // deal the dead man's hand
+      const box=$('#cards');box.innerHTML='';$('#explain').classList.remove('show');
+      SUITS.forEach((s,i)=>{const d=document.createElement('div');d.className='card'+(i===4?' hole':'');d.style.setProperty('--r',((i-2)*8)+'deg');
+        d.innerHTML='<span>'+(i<4?'A':'?')+'</span><span style="align-self:center;font-size:18px">'+s+'</span><span style="transform:rotate(180deg);align-self:end">'+(i<4?'A':'?')+'</span>';
+        box.appendChild(d);cardTimer.push(setTimeout(()=>d.classList.add('up'),80+i*130))});
+      // show accept/reject buttons
+      const row=document.createElement('div');row.className='row';row.style.marginTop='14px';
+      row.innerHTML='<button class="btn gold" id="acceptHand">accept the hand — run anyway</button> <button class="btn blood" id="rejectHand">let it rest — do not run</button>';
+      term.appendChild(row);
+      $('#acceptHand').onclick=async()=>{
+        row.remove();
+        const r2=await jfetch('/api/exec',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({cmd,confirm:true})});
+        term.lastChild.remove();
+        if(r2.stdout)out(r2.stdout.replace(/\n$/,''));
+        if(r2.stderr)err(r2.stderr.replace(/\n$/,''));
+        out('· exit '+r2.exit+' in '+r2.ms+' ms');
+      };
+      $('#rejectHand').onclick=()=>{row.remove();out('· refused by the Exorcist — command laid to rest');};
+      return;
+    }
     if(r.stdout)out(r.stdout.replace(/\n$/,''));
     if(r.stderr)err(r.stderr.replace(/\n$/,''));
     if(r.guard){line('err','['+r.guard.severity.toUpperCase()+'] '+r.guard.pattern+' — '+esc(r.guard.reason))}

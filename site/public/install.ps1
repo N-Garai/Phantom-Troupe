@@ -1,76 +1,51 @@
-# Phantom Troupe — one-line installer for Windows PowerShell.
-# Detects the environment, installs the CLI, writes the PowerShell hooks,
-# and leaves the troupe ready to wake.  irm <url>/install.ps1 | iex
-
+# phantom-troupe install — Windows PowerShell
+# One command, everything else follows. Requires Node 18.17+.
 $ErrorActionPreference = "Stop"
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-$GOLD    = "`e[38;5;214m"; $SPECTRE = "`e[38;5;120m"; $DIM = "`e[2m"; $BOLD = "`e[1m"; $RESET = "`e[0m"
-if ($PSVersionTable.PSVersion.Major -lt 7 -or -not $PSStyle) {
-    $GOLD = ""; $SPECTRE = ""; $DIM = ""; $BOLD = ""; $RESET = ""  # no ansi, no drama
+$REQUIRED_NODE = "18.17"
+
+Write-Host "[phantom-troupe] checking Node.js…" -ForegroundColor Cyan
+
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+  Write-Host "[phantom-troupe] Node.js not found. Install it first:"
+  Write-Host "  winget install OpenJS.NodeJS.LTS"
+  Write-Host "  or get it at https://nodejs.org" -ForegroundColor Yellow
+  exit 1
 }
+
+$NODE_VERSION = (node -v).TrimStart('v')
+$NODE_MAJOR = [int]($NODE_VERSION.Split('.')[0])
+$NODE_MINOR = [int]($NODE_VERSION.Split('.')[1])
+$REQ_MAJOR = [int]($REQUIRED_NODE.Split('.')[0])
+$REQ_MINOR = [int]($REQUIRED_NODE.Split('.')[1])
+
+if ($NODE_MAJOR -lt $REQ_MAJOR -or ($NODE_MAJOR -eq $REQ_MAJOR -and $NODE_MINOR -lt $REQ_MINOR)) {
+  Write-Host "[phantom-troupe] Node $NODE_VERSION is too old — need $REQUIRED_NODE+" -ForegroundColor Red
+  exit 1
+}
+
+Write-Host "[phantom-troupe] Node $NODE_VERSION OK" -ForegroundColor Green
+
+# Resolve the directory this script lives in
+$SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+Write-Host "[phantom-troupe] installing dependencies…" -ForegroundColor Cyan
+npm install --prefix "$SCRIPT_DIR"
+
+Write-Host "[phantom-troupe] building…" -ForegroundColor Cyan
+npm run build --prefix "$SCRIPT_DIR"
+
+Write-Host "[phantom-troupe] linking binary…" -ForegroundColor Cyan
+npm link --prefix "$SCRIPT_DIR"
+
+Write-Host "[phantom-troupe] initializing hooks and config…" -ForegroundColor Cyan
+phantom init
 
 Write-Host ""
-Write-Host "  $BOLD$GOLD   ___              _                      _             $RESET"
-Write-Host "$BOLD$GOLD  | _ \_ _ _____ __| |__ _ _  _ _ __  __ _| |___ _ _  ___ $RESET"
-Write-Host "$GOLD  |  _/ '_/ -_) V  / _ \ '_| || '  \/ _` | / _ \ ' \/ -)$RESET"
-Write-Host "$GOLD  |_| |_|\___|\_/|\___/_|  \_,_|_|\__,_|_\\___/_||_\___|$RESET"
-Write-Host "$DIM   the graveyard of CLI scripts — local, open, yours$RESET"
+Write-Host "[phantom-troupe] installed." -ForegroundColor Green
+Write-Host "  phantom            — wake the troupe"
+Write-Host "  phantom graveyard  — local séance UI at http://127.0.0.1:7313"
+Write-Host "  phantom stop       — sleep the troupe" -ForegroundColor Cyan
 Write-Host ""
-
-# --- node check --------------------------------------------------------------
-function Have-Node {
-    try { $null = & node -v; return $true } catch { return $false }
-}
-
-if (-not (Have-Node)) {
-    Write-Host "$SPECTRE no Node.js found. install it (18+) with:$RESET" >&2
-    Write-Host "  winget install OpenJS.NodeJS.LTS      # or https://nodejs.org" >&2
-    exit 1
-}
-Write-Host "$SPECTRE· node $(node -v) answered$RESET"
-
-# --- install -----------------------------------------------------------------
-$withTimer = if ($env:PHANTOM_WITH_TIMER) { "--with-timer" } else { "" }
-$done = $false
-if (Get-Command npm -ErrorAction SilentlyContinue) {
-    Write-Host "$SPECTRE· pulling the troupe from the registry (npm)…$RESET"
-    try { npm i -g phantom-troupe; if ($LASTEXITCODE -eq 0) { $done = $true } } catch { }
-}
-if (-not $done) {
-    Write-Host "$SPECTRE· registry refused — resurrecting from the source tarball…$RESET"
-    $tmp = Join-Path ([IO.Path]::GetTempPath()) "phantom-troupe-install"
-    Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue
-    New-Item -ItemType Directory -Force $tmp | Out-Null
-    $zip = Join-Path $tmp "troupe.zip"
-    $branch = if ($env:PHANTOM_RELEASE) { $env:PHANTOM_RELEASE } else { "main" }
-    Invoke-WebRequest -UseBasicParsing "https://codeload.github.com/N-Garai/Phantom-Troupe/zip/refs/heads/$branch" -OutFile $zip
-    Expand-Archive -Force $zip $tmp
-    $dir = Get-ChildItem $tmp -Directory | Where-Object Name -like "Phantom-Troupe*" | Select-Object -First 1
-    Push-Location (Join-Path $dir.FullName "phantom-cli")
-    npm install
-    npm link
-    Pop-Location
-    $done = $true
-}
-
-# --- init (bypass the .ps1 shim: execution policies bite shims) ---------------
-Write-Host "$SPECTRE· haunting your shell…$RESET"
-$globalRoot = (& npm prefix -g).Trim()
-$entry = Join-Path $globalRoot "node_modules\phantom-troupe\dist\index.js"
-if (-not (Test-Path $entry)) { $entry = $script:entryFallback }
-if ($done -and (Test-Path $entry)) {
-    & node $entry init $withTimer
-} else {
-    phantom init $withTimer
-}
-
-Write-Host ""
-Write-Host "$GOLD the troupe is ready.$RESET $DIM Wake them:$RESET"
-Write-Host "  $BOLD phantom$RESET              $DIM wake the helper in the background$RESET"
-Write-Host "  $BOLD phantom graveyard$RESET    $DIM the séance UI (site or grid)$RESET"
-Write-Host "  $BOLD phantom stop$RESET         $DIM sleep — the bones are kept$RESET"
-Write-Host ""
-Write-Host "$DIM open a NEW PowerShell window so the hooks load, then break a command:$RESET"
-Write-Host "$DIM   gti status     <- a misspelled corpse for the Coroner$RESET"
-Write-Host ""
+Write-Host "Optional local brain: ollama pull gemma3:4b"
+Write-Host "Or switch to Gemma API key in ~/.phantom/config.json" -ForegroundColor Cyan
